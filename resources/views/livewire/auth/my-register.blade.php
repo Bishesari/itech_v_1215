@@ -7,13 +7,13 @@ use App\Models\Contact;
 use App\Models\OtpLog;
 use App\Models\User;
 use App\Rules\NCode;
+use Flux\Flux;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Volt\Component;
 
-new class extends Component
-{
+new class extends Component {
     // === Configuration ===
     private const OTP_RESEND_DELAY = 120;         // seconds until next allowed send
     private const OTP_TTL = 300;                  // seconds OTP is valid (e.g., 5 minutes)
@@ -23,6 +23,8 @@ new class extends Component
 
     // === Public properties (bound to UI) ===
     public string $context = 'modal'; // modal | page
+    public string $f_name_fa = '';
+    public string $l_name_fa = '';
     public string $n_code = '';
     public string $contact_value = '';
     public string $u_otp = '';
@@ -32,6 +34,8 @@ new class extends Component
     protected function rules(): array
     {
         return [
+            'f_name_fa' => ['required', 'min:2', 'max:30'],
+            'l_name_fa' => ['required', 'min:2', 'max:30'],
             'n_code' => ['required', 'digits:10', new NCode, 'unique:profiles'],
             'contact_value' => ['required', 'starts_with:09', 'digits:11'],
         ];
@@ -60,7 +64,7 @@ new class extends Component
         $this->validate();
 
         // If rate limits / timers fail, show errors
-        if (! $this->log_check(showError: true)) {
+        if (!$this->log_check(showError: true)) {
             return;
         }
 
@@ -131,7 +135,7 @@ new class extends Component
         // If we have a last record, check resend window and per-n-code limit
         if ($latest) {
             // If resend wait still active => block and set timer
-            if (! empty($latest->otp_next_try_time) && $latest->otp_next_try_time > time()) {
+            if (!empty($latest->otp_next_try_time) && $latest->otp_next_try_time > time()) {
                 $this->timer = $latest->otp_next_try_time - time();
                 $this->dispatch('set_timer');
 
@@ -154,7 +158,7 @@ new class extends Component
         }
 
         // if no latest record (first send for this n_code in 24h), check ip uniqueness limit
-        if ((int) $uniqueNcodesForIp >= self::MAX_UNIQUE_N_CODES_PER_IP_PER_DAY) {
+        if ((int)$uniqueNcodesForIp >= self::MAX_UNIQUE_N_CODES_PER_IP_PER_DAY) {
             if ($showError) {
                 $this->otp_log_check_err = 'این IP در ۲۴ ساعت گذشته بیش از حد مجاز ثبت‌نام انجام داده است.';
             }
@@ -178,8 +182,8 @@ new class extends Component
             ->latest('id')
             ->first();
 
-        if (! $latest) {
-            $this->otp_log_check_err = 'هنوز کدی ارسال نشده است.';
+        if (!$latest) {
+            $this->otp_log_check_err = 'هنوز کدی به این شماره ارسال نشده است.';
             return;
         }
         // بازسازی تایمر برای جلوگیری از Expire اشتباه
@@ -203,7 +207,7 @@ new class extends Component
             return;
         }
 
-        if (! hash_equals((string)$storedOtp, (string)$this->u_otp)) {
+        if (!hash_equals((string)$storedOtp, (string)$this->u_otp)) {
             $this->otp_log_check_err = 'کد پیامکی اشتباه است.';
             return;
         }
@@ -240,6 +244,8 @@ new class extends Component
             $user->profile()->create([
                 'identifier_type' => 'national_id',
                 'n_code' => $this->n_code,
+                'f_name_fa' => $this->f_name_fa,
+                'l_name_fa' => $this->l_name_fa,
             ]);
 
             $user->contacts()->syncWithoutDetaching([$contact->id]);
@@ -283,8 +289,14 @@ new class extends Component
     <x-auth-header :title="__('ایجاد حساب کاربری')" :description="__('جهت ایجاد حساب، اطلاعات را وارد نمایید.')"/>
     <x-auth-session-status class="text-center" :status="session('status')"/>
     <form wire:submit.prevent="check_inputs" class="space-y-4 flex flex-col gap-4" autocomplete="off">
-        <x-my.flt_lbl name="n_code" label="{{__('کدملی:')}}" dir="ltr" maxlength="10"
+        <x-my.flt_lbl name="f_name_fa" label="{{__('نام:')}}" maxlength="30"
                       class="tracking-wider font-semibold" autofocus required/>
+
+        <x-my.flt_lbl name="l_name_fa" label="{{__('نام خانوادگی:')}}" maxlength="40"
+                      class="tracking-wider font-semibold" required/>
+
+        <x-my.flt_lbl name="n_code" label="{{__('کدملی:')}}" dir="ltr" maxlength="10"
+                      class="tracking-wider font-semibold" required/>
         <x-my.flt_lbl name="contact_value" label="{{__('شماره موبایل:')}}" dir="ltr" maxlength="11"
                       class="tracking-wider font-semibold" required/>
         <flux:button type="submit" variant="primary" color="teal" class="w-full cursor-pointer">
