@@ -23,6 +23,8 @@ class DatabaseSeeder extends Seeder
             CitySeeder::class,
             BranchSeeder::class,
             BranchRoleUserSeeder::class,
+            FieldSeeder::class,
+            StandardSeeder::class,
         ]);
     }
 }
