@@ -10,8 +10,8 @@ class ContactSeeder extends Seeder
     public function run(): void
     {
         $mobiles = [
-            ['value'=>'09177755924', 'is_verified'=>true],
-            ['value'=>'09034336111']
+            ['contact_value'=>'09177755924', 'is_verified'=>true],
+            ['contact_value'=>'09034336111']
         ];
         foreach ($mobiles as $data) {
             Contact::create($data);

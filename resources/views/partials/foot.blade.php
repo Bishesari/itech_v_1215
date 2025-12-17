@@ -32,17 +32,17 @@
             {{jdate('Y', time(), '', '', 'en')}}
         </flux:text>
 
-        <flux:text class="pt-4">
+        <flux:text class="pt-3">
             {{__('تماس: 6111 433 903 98+')}}
             {{__(' و ')}}
             {{__('Yasser.Bishesari@Gmail.Com')}}
         </flux:text>
 
-        <flux:text class="pt-4">
+        <flux:text class="pt-3">
             {{__('برنامه نویسی و اجرا: بیشه سری')}}
         </flux:text>
 
-        <flux:text class="pt-4">
+        <flux:text class="pt-3">
             {{__('SV: 12.1.5 - LV:')}}
             {{__(Illuminate\Foundation\Application::VERSION)}}
             {{__(' - PV:'.PHP_VERSION)}}

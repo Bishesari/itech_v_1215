@@ -2,12 +2,11 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 
@@ -40,6 +39,24 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Contact::class)
             ->withPivot('is_primary')
+            ->withTimestamps();
+    }
+
+    public function getAllRolesWithBranches()
+    {
+        return DB::table('branch_role_user')
+            ->join('roles', 'branch_role_user.role_id', '=', 'roles.id')
+            ->leftJoin('branches', 'branch_role_user.branch_id', '=', 'branches.id')
+            ->where('branch_role_user.user_id', $this->id)
+            ->select(
+                'roles.id as role_id', 'roles.name_fa as role_name', 'branches.id as branch_id', 'branches.name as branch_name'
+            )
+            ->get();
+    }
+
+    public function roles():BelongsToMany
+    {
+        return $this->belongsToMany(Role::class)
             ->withTimestamps();
     }
 }

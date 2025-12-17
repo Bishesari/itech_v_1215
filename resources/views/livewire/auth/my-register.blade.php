@@ -24,7 +24,7 @@ new class extends Component
     // === Public properties (bound to UI) ===
     public string $context = 'modal'; // modal | page
     public string $n_code = '';
-    public string $mobile_nu = '';
+    public string $contact_value = '';
     public string $u_otp = '';
     public int $timer = 0; // front-end countdown
     public string $otp_log_check_err = '';
@@ -33,7 +33,7 @@ new class extends Component
     {
         return [
             'n_code' => ['required', 'digits:10', new NCode, 'unique:profiles'],
-            'mobile_nu' => ['required', 'starts_with:09', 'digits:11'],
+            'contact_value' => ['required', 'starts_with:09', 'digits:11'],
         ];
     }
 
@@ -76,14 +76,14 @@ new class extends Component
         OtpLog::create([
             'ip' => request()->ip(),
             'n_code' => $this->n_code,
-            'mobile_nu' => $this->mobile_nu,
+            'contact_value' => $this->contact_value,
             'otp' => $encryptedOtp,
             'otp_next_try_time' => time() + self::OTP_RESEND_DELAY,
             'otp_expires_at' => now()->addSeconds(self::OTP_TTL),
         ]);
 
         // Dispatch SMS job with plain OTP (job can be retried safely)
-        OtpSend::dispatch($this->mobile_nu, $otp);
+        OtpSend::dispatch($this->contact_value, $otp);
 
         // start client timer
         $this->timer = self::OTP_RESEND_DELAY;
@@ -174,7 +174,7 @@ new class extends Component
         // Find latest OTP record for this n_code + mobile
         $latest = DB::table(self::OTP_TABLE)
             ->where('n_code', $this->n_code)
-            ->where('mobile_nu', $this->mobile_nu)
+            ->where('contact_value', $this->contact_value)
             ->latest('id')
             ->first();
 
@@ -227,12 +227,12 @@ new class extends Component
             // remove OTP logs for this n_code + mobile
             DB::table(self::OTP_TABLE)
                 ->where('n_code', $this->n_code)
-                ->where('mobile_nu', $this->mobile_nu)
+                ->where('contact_value', $this->contact_value)
                 ->delete();
 
             // contact - search by mobile only, set verified flag if new
             $contact = Contact::firstOrCreate(
-                ['mobile_nu' => $this->mobile_nu],
+                ['contact_value' => $this->contact_value],
                 ['verified' => 1]
             );
 
@@ -245,7 +245,7 @@ new class extends Component
             $user->contacts()->syncWithoutDetaching([$contact->id]);
 
             // send the temporary password via SmsPass job
-            SmsPass::dispatch($this->mobile_nu, $this->n_code, $tempPass);
+            SmsPass::dispatch($this->contact_value, $this->n_code, $tempPass);
 
             event(new Registered($user));
             Auth::login($user);
@@ -285,7 +285,7 @@ new class extends Component
     <form wire:submit.prevent="check_inputs" class="space-y-4 flex flex-col gap-4" autocomplete="off">
         <x-my.flt_lbl name="n_code" label="{{__('کدملی:')}}" dir="ltr" maxlength="10"
                       class="tracking-wider font-semibold" autofocus required/>
-        <x-my.flt_lbl name="mobile_nu" label="{{__('شماره موبایل:')}}" dir="ltr" maxlength="11"
+        <x-my.flt_lbl name="contact_value" label="{{__('شماره موبایل:')}}" dir="ltr" maxlength="11"
                       class="tracking-wider font-semibold" required/>
         <flux:button type="submit" variant="primary" color="teal" class="w-full cursor-pointer">
             {{ __('ادامه ثبت نام') }}

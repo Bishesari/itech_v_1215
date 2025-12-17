@@ -14,15 +14,16 @@ return new class extends Migration
         Schema::create('contacts', function (Blueprint $table) {
             $table->id();
 
-            $table->string('value', 100); // شماره موبایل یا شماره تلفن یا آدرس پست الکترونیک
-            $table->enum('type', ['mobile', 'email', 'phone'])->default('mobile');
+            $table->string('contact_value', 100); // شماره موبایل یا شماره تلفن یا آدرس پست الکترونیک
+            $table->string('type', 20)->default('mobile');
+            // mobile | email | phone | ...
 
             $table->boolean('is_verified')->default(false);
             $table->boolean('is_active')->default(true);
 
             $table->timestamps();
 
-            $table->unique(['type', 'value']);
+            $table->unique(['type', 'contact_value']);
 
         });
     }
