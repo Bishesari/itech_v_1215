@@ -3,10 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
-
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Volt::route('/', 'welcome')->name('home');
+//Route::get('/', function () {    return view('welcome');})->name('home');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
@@ -30,3 +28,5 @@ Route::middleware(['auth'])->group(function () {
         )
         ->name('two-factor.show');
 });
+Volt::route('forgotten-password', 'auth.my-forgot-password')
+    ->name('forgotten.password');
