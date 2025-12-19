@@ -26,7 +26,7 @@ class extends Component {
     // === Public properties (bound to UI) ===
     public int $step = 1;
     public string $n_code = '';
-    public string $mobile_nu = '';
+    public string $contact_value = '';
     public array $mobiles = [];
     public string $u_otp = '';
     public int $timer = 0; // front-end countdown
@@ -36,7 +36,7 @@ class extends Component {
     {
         return [
             'n_code' => ['required'],
-            'mobile_nu' => ['required']
+            'contact_value' => ['required']
         ];
     }
 
@@ -53,13 +53,14 @@ class extends Component {
             return;
         }
         $user = $profile->user;
-        $this->mobiles = $user->contacts->pluck('mobile_nu')->toArray();
+        $this->mobiles = $user->contacts->pluck('contact_value')->toArray();
         if (empty($this->mobiles)) {
             $this->addError('n_code', 'هیچ شماره موبایلی برای این کد ملی ثبت نشده است.');
             return;
         }
         if (count($this->mobiles) == 1) {
-            $this->mobile_nu = $this->mobiles[0];
+            $this->contact_value = $this->mobiles[0];
+            $this->otp_send();
         }
         $this->log_check();
         $this->u_otp = '';
@@ -92,18 +93,20 @@ class extends Component {
         OtpLog::create([
             'ip' => request()->ip(),
             'n_code' => $this->n_code,
-            'mobile_nu' => $this->mobile_nu,
+            'contact_value' => $this->contact_value,
             'otp' => $encryptedOtp,
             'otp_next_try_time' => time() + self::OTP_RESEND_DELAY,
             'otp_expires_at' => now()->addSeconds(self::OTP_TTL),
         ]);
 
         // Dispatch SMS job with plain OTP (job can be retried safely)
-        OtpSend::dispatch($this->mobile_nu, $otp);
+        OtpSend::dispatch($this->contact_value, $otp);
 
         // start client timer
         $this->timer = self::OTP_RESEND_DELAY;
         $this->dispatch('set_timer');
+
+        $this->dispatch('focus-otp');
     }
 
     // -------------------------
@@ -190,7 +193,7 @@ class extends Component {
         // Find latest OTP record for this n_code + mobile
         $latest = DB::table(self::OTP_TABLE)
             ->where('n_code', $this->n_code)
-            ->where('mobile_nu', $this->mobile_nu)
+            ->where('contact_value', $this->contact_value)
             ->latest('id')
             ->first();
 
@@ -236,11 +239,11 @@ class extends Component {
             // remove OTP logs for this n_code + mobile
             DB::table(self::OTP_TABLE)
                 ->where('n_code', $this->n_code)
-                ->where('mobile_nu', $this->mobile_nu)
+                ->where('contact_value', $this->contact_value)
                 ->delete();
 
             // send the temporary password via SmsPass job
-            SmsPass::dispatch($this->mobile_nu, $user->user_name, $tempPass);
+            SmsPass::dispatch($this->contact_value, $user->user_name, $tempPass);
         });
 
         // stop client timer and redirect or reload
@@ -252,7 +255,7 @@ class extends Component {
     {
         $this->reset([
             'n_code',
-            'mobile_nu',
+            'contact_value',
             'mobiles',
             'u_otp',
             'step',
@@ -297,19 +300,22 @@ class extends Component {
             <div class="grid grid-cols-2 gap-4">
                 <flux:text class="mt-2 text-center">{{__('کدملی: ')}}{{$n_code}}</flux:text>
                 @if(count($mobiles) > 1)
-                    <flux:select wire:model="mobile_nu" variant="listbox" placeholder="انتخاب موبایل">
+                    <flux:select wire:model="contact_value" variant="listbox" placeholder="انتخاب موبایل">
                         @foreach($mobiles as $mobile)
                             <flux:select.option value="{{$mobile}}"
                                                 style="text-align: center">{{mask_mobile($mobile)}}</flux:select.option>
                         @endforeach
                     </flux:select>
                 @else
-                    <flux:text class="mt-2 text-center">{{__('موبایل: ')}}{{mask_mobile($mobile_nu)}}</flux:text>
+                    <flux:text class="mt-2 text-center">{{__('موبایل: ')}}{{mask_mobile($contact_value)}}</flux:text>
                 @endif
             </div>
 
-            <flux:otp wire:model="u_otp" submit="auto" length="6" label="OTP Code" label:sr-only :error:icon="false"
-                      error:class="text-center" class="mx-auto" dir="ltr"/>
+            <flux:otp wire:model="u_otp" id="otp-input-wrapper" submit="auto" :error:icon="false" error:class="text-center" class="mx-auto" dir="ltr">
+                <flux:otp.input autofocus/> <flux:otp.input /> <flux:otp.input />
+                <flux:otp.separator />
+                <flux:otp.input /> <flux:otp.input /><flux:otp.input />
+            </flux:otp>
 
             @if($otp_log_check_err)
                 <flux:text class="text-center" color="rose">{{$otp_log_check_err}}</flux:text>
@@ -373,6 +379,23 @@ class extends Component {
             clearTimerInterval();
             $wire.set('timer', 0);
         });
+
+        // کد برای فوکوس
+        Livewire.on('focus-otp', () => {
+            // یک تاخیر کوتاه (مثلا ۳۰۰ میلی‌ثانیه) می‌دهیم تا مدال کامل باز شود
+            setTimeout(() => {
+                // پیدا کردن کانتینر اصلی
+                const wrapper = document.getElementById('otp-input-wrapper');
+                if (wrapper) {
+                    // پیدا کردن اولین اینپوت داخل کانتینر
+                    const firstInput = wrapper.querySelector('input');
+                    if (firstInput) {
+                        firstInput.focus();
+                    }
+                }
+            }, 300);
+        });
+
     </script>
     @endscript
 </div>

@@ -52,6 +52,7 @@ new class extends Component {
         $this->log_check(showError: false);
 
         $this->u_otp = '';
+        $this->otp_send();
         $this->modal('otp_verify')->show();
     }
 
@@ -92,6 +93,8 @@ new class extends Component {
         // start client timer
         $this->timer = self::OTP_RESEND_DELAY;
         $this->dispatch('set_timer');
+
+        $this->dispatch('focus-otp');
     }
 
     // -------------------------
@@ -140,7 +143,7 @@ new class extends Component {
                 $this->dispatch('set_timer');
 
                 if ($showError) {
-                    $this->otp_log_check_err = 'تا زمان امکان ارسال مجدد لطفاً منتظر بمانید.';
+                    $this->otp_log_check_err = 'تا زمان امکان ارسال مجدد لطفاً منتظر بمانید!';
                 }
                 return false;
             }
@@ -324,15 +327,20 @@ new class extends Component {
 
 
     {{-------------------------- OTP VERIFY Modal --------------------------}}
-    <flux:modal name="otp_verify" class="md:w-96" :dismissible="false">
+    <flux:modal name="otp_verify" class="md:w-96" :dismissible="false" focusable>
         <form wire:submit.prevent="otp_verify" class="space-y-8">
             <div class="max-w-72 mx-auto space-y-2">
                 <flux:heading size="lg" class="text-center">{{__('تایید کد پیامکی')}}</flux:heading>
-                <flux:text class="text-center">{{__('دکمه ارسال را کلیک نموده و کد دریافتی را وارد کنید.')}}</flux:text>
+                <flux:text class="text-center">{{__('کد پیامک شده را وارد کنید.')}}</flux:text>
             </div>
 
-            <flux:otp wire:model="u_otp" submit="auto" length="6" label="OTP Code" label:sr-only :error:icon="false"
-                      error:class="text-center" class="mx-auto" dir="ltr"/>
+
+            <flux:otp wire:model="u_otp" id="otp-input-wrapper" submit="auto" :error:icon="false" error:class="text-center" class="mx-auto" dir="ltr">
+                <flux:otp.input autofocus/> <flux:otp.input /> <flux:otp.input />
+                <flux:otp.separator />
+                <flux:otp.input /> <flux:otp.input /><flux:otp.input />
+            </flux:otp>
+
 
             @if($otp_log_check_err)
                 <flux:text class="text-center" color="rose">{{$otp_log_check_err}}</flux:text>
@@ -396,6 +404,23 @@ new class extends Component {
             clearTimerInterval();
             $wire.set('timer', 0);
         });
+
+        // کد برای فوکوس
+        Livewire.on('focus-otp', () => {
+            // یک تاخیر کوتاه (مثلا ۳۰۰ میلی‌ثانیه) می‌دهیم تا مدال کامل باز شود
+            setTimeout(() => {
+                // پیدا کردن کانتینر اصلی
+                const wrapper = document.getElementById('otp-input-wrapper');
+                if (wrapper) {
+                    // پیدا کردن اولین اینپوت داخل کانتینر
+                    const firstInput = wrapper.querySelector('input');
+                    if (firstInput) {
+                        firstInput.focus();
+                    }
+                }
+            }, 300);
+        });
+
     </script>
     @endscript
 </div>
