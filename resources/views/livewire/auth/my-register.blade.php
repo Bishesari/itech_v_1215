@@ -288,10 +288,10 @@ new class extends Component {
 ?>
 
 
-<div class="flex flex-col gap-6">
+<div class="flex flex-col">
     <x-auth-header :title="__('ایجاد حساب کاربری')" :description="__('جهت ایجاد حساب، اطلاعات را وارد نمایید.')"/>
     <x-auth-session-status class="text-center" :status="session('status')"/>
-    <form wire:submit.prevent="check_inputs" class="space-y-4 flex flex-col gap-4" autocomplete="off">
+    <form wire:submit.prevent="check_inputs" class="flex flex-col gap-6 mt-5" autocomplete="off">
         <x-my.flt_lbl name="f_name_fa" label="{{__('نام:')}}" maxlength="30"
                       class="tracking-wider font-semibold" autofocus required/>
 
@@ -317,7 +317,7 @@ new class extends Component {
             </flux:modal.trigger>
         </div>
     @else
-        <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400">
+        <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400 mt-4">
             <span>{{ __('حساب کاربری داشته اید؟') }}</span>
             <flux:button :href="route('login')" wire:navigate variant="ghost" icon:trailing="arrow-down-left" size="sm"
                          class="cursor-pointer">{{ __('وارد شوید.') }}

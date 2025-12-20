@@ -62,7 +62,7 @@ new class extends Component {
                    :description="__('نام کاربری (کدملی) و پسورد قبلا پیامک شده است.')"/>
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')"/>
-    <form wire:submit.prevent="login" class="space-y-4 flex flex-col gap-4" autocomplete="off">
+    <form wire:submit.prevent="login" class="space-y-4 flex flex-col gap-3" autocomplete="off">
         <x-my.flt_lbl name="user_name" label="{{__('نام کاربری:')}}" dir="ltr" maxlength="25"
                       class="tracking-wider font-semibold" autofocus required/>
 

@@ -17,18 +17,12 @@
 
     <flux:navbar class="-mb-px max-lg:hidden">
         <flux:navbar.item icon="home" :href="route('home')" :current="request()->routeIs('home')" wire:navigate>{{ __('صفحه اول') }}</flux:navbar.item>
-        <flux:navbar.item icon="inbox" badge="12" href="#">Inbox</flux:navbar.item>
-        <flux:navbar.item icon="document-text" href="#">Documents</flux:navbar.item>
-        <flux:navbar.item icon="calendar" href="#">Calendar</flux:navbar.item>
-        <flux:separator vertical variant="subtle" class="my-2"/>
-        <flux:dropdown class="max-lg:hidden">
-            <flux:navbar.item icon:trailing="chevron-down">Favorites</flux:navbar.item>
-            <flux:navmenu>
-                <flux:navmenu.item href="#">Marketing site</flux:navmenu.item>
-                <flux:navmenu.item href="#">Android app</flux:navmenu.item>
-                <flux:navmenu.item href="#">Brand guidelines</flux:navmenu.item>
-            </flux:navmenu>
-        </flux:dropdown>
+        @auth()
+            <flux:navbar.item icon="computer-desktop" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
+                {{ __('داشبرد') }}
+            </flux:navbar.item>
+        @endauth
+
     </flux:navbar>
     <flux:spacer />
     <flux:navbar class="me-4">
@@ -101,16 +95,8 @@
 
     <flux:sidebar.nav>
         <flux:sidebar.item icon="home" :href="route('home')" :current="request()->routeIs('home')" wire:navigate>{{ __('صفحه اول') }}</flux:sidebar.item>
+        <flux:sidebar.item icon="computer-desktop" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('داشبرد') }}</flux:sidebar.item>
 
-        <flux:sidebar.item icon="inbox" badge="12" href="#">Inbox</flux:sidebar.item>
-        <flux:sidebar.item icon="document-text" href="#">Documents</flux:sidebar.item>
-        <flux:sidebar.item icon="calendar" href="#">Calendar</flux:sidebar.item>
-
-        <flux:sidebar.group expandable heading="Favorites" class="grid">
-            <flux:sidebar.item href="#">Marketing site</flux:sidebar.item>
-            <flux:sidebar.item href="#">Android app</flux:sidebar.item>
-            <flux:sidebar.item href="#">Brand guidelines</flux:sidebar.item>
-        </flux:sidebar.group>
 
     </flux:sidebar.nav>
 

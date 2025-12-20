@@ -3,12 +3,21 @@
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Volt\Component;
+use App\Helpers\PageVisitHelper;
 
 new
 #[Layout('components.layouts.public')]
 #[Title('آموزشگاه کامپیوتر، حسابداری، معماری و عکاسی در بوشهر | دوره‌های مهارتی')]
 class extends Component {
-    //
+
+    public int $visits = 0;
+
+    public function mount(): void
+    {
+        PageVisitHelper::register('home');
+        // گرفتن تعداد بازدید
+        $this->visits = PageVisitHelper::count('home');
+    }
 }; ?>
 
 <div>
@@ -36,5 +45,4 @@ class extends Component {
 هدف ما آموزش مهارت‌هایی است که واقعاً منجر به اشتغال و پیشرفت شغلی شوند.')}}
     </flux:text>
     <flux:separator variant="subtle" />
-
 </div>
