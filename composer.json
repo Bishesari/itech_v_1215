@@ -10,6 +10,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "jenssegers/agent": "^2.6",
         "laravel/fortify": "^1.30",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
@@ -34,9 +35,9 @@
             "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
-            "app/Functions/formats.php",
-            "app/Functions/jdf.php",
-            "app/Functions/random_key_generate.php",
+            "app/Helpers/formats.php",
+            "app/Helpers/jdf.php",
+            "app/Helpers/random_key_generate.php",
             "app/Helpers/PageVisitHelper.php"
         ]
     },

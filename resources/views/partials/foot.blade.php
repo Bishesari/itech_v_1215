@@ -1,10 +1,13 @@
+@php
+    // صفحه فعلی را شناسایی می‌کنیم
+    $pageKey = \App\Helpers\PageVisitHelper::resolvePageKey();
+
+    // تعداد بازدیدهای انسانی (غیر bot) را می‌گیریم
+    $visits = \App\Helpers\PageVisitHelper::countHuman($pageKey);
+@endphp
 <flux:footer
     class="bg-zinc-50 grid grid-cols-1 md:grid-cols-2 dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-700">
 
-    @php
-        $pageKey = \App\Helpers\PageVisitHelper::resolvePageKey();
-        $visits  = \App\Helpers\PageVisitHelper::countHuman($pageKey);
-    @endphp
 
     <div class="text-center">
         <a href="{{ route('home') }}" class="flex flex-col items-center" wire:navigate>
@@ -48,7 +51,7 @@
             {{__('S.V: 12.1.5 - L.V:')}}
             {{__(Illuminate\Foundation\Application::VERSION)}}
             {{__(' - PHP.V: '.PHP_VERSION)}}
-            {{__(' - P.V: '. $visits )}}
+            {{__(' - P.V: ' . $visits )}}
         </flux:text>
 
         <flux:text class="pt-3">
@@ -56,28 +59,18 @@
         </flux:text>
 
     </div>
-
-    <script>
-        (function () {
-            if (document.cookie.includes('fp=')) return;
-
-            const data = [
-                navigator.userAgent,
-                navigator.language,
-                screen.width + 'x' + screen.height,
-                screen.colorDepth,
-                Intl.DateTimeFormat().resolvedOptions().timeZone,
-                navigator.hardwareConcurrency,
-            ].join('|');
-
-            crypto.subtle.digest('SHA-256', new TextEncoder().encode(data))
-                .then(buffer => {
-                    const hash = Array.from(new Uint8Array(buffer))
-                        .map(b => b.toString(16).padStart(2, '0'))
-                        .join('');
-                    document.cookie = `fp=${hash}; path=/; max-age=31536000; SameSite=Lax`;
-                });
-        })();
-    </script>
-
 </flux:footer>
+<script>
+    (function () {
+        if (document.cookie.includes('fp=')) return;
+
+        const fp =
+            navigator.userAgent +
+            '|' + navigator.language +
+            '|' + screen.width + 'x' + screen.height;
+
+        const hash = btoa(fp).replace(/=/g, '');
+
+        document.cookie = 'fp=' + hash + '; path=/; max-age=31536000; SameSite=Lax';
+    })();
+</script>

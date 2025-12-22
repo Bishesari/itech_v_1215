@@ -14,22 +14,26 @@ return new class extends Migration
         Schema::create('page_visits', function (Blueprint $table) {
             $table->id();
 
-            $table->string('page_key')->index();          // شناسه پایدار صفحه / مدل
-            $table->string('fingerprint', 64)->nullable()->index();
+            $table->string('page_key', 100)->index();
 
-            $table->enum('visitor_type', ['human', 'bot'])->index();
+            $table->string('fingerprint', 255)->index();
 
-            $table->string('ip', 50)->nullable();
-            $table->string('user_agent')->nullable();
+            // کاربر مهمان هم مجاز است
+            $table->foreignId('user_id')
+                ->nullable()
+                ->constrained()
+                ->nullOnDelete();
 
-            $table->date('visit_date')->index();
+            $table->ipAddress('ip')->nullable();
+
+            $table->text('user_agent')->nullable();
+
+            $table->boolean('is_bot')->default(false);
+
             $table->timestamps();
 
-            // یکتایی بازدید روزانه برای کاربران واقعی
-            $table->unique(
-                ['page_key', 'fingerprint', 'visit_date'],
-                'unique_human_daily_visit'
-            );
+            // جلوگیری از ثبت بازدید تکراری در یک بازه کوتاه (اختیاری)
+            $table->unique(['page_key', 'fingerprint', 'user_id']);
         });
     }
 

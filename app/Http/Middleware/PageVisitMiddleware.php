@@ -9,7 +9,7 @@ class PageVisitMiddleware
     public function handle($request, Closure $next)
     {
         if ($request->isMethod('get')) {
-            PageVisitHelper::register();
+            PageVisitHelper::record();
         }
 
         return $next($request);

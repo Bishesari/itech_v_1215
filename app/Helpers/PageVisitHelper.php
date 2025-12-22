@@ -1,88 +1,92 @@
 <?php
+
 namespace App\Helpers;
 
 use App\Models\PageVisit;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Request;
+use Jenssegers\Agent\Agent;
 use Illuminate\Support\Str;
 
 class PageVisitHelper
 {
-    /* تشخیص Bot */
-    protected static function detectVisitorType(): string
+    /* ========= Fingerprint ========= */
+
+    protected static function resolveFingerprint(): string
     {
-        $ua = strtolower(request()->userAgent() ?? '');
-
-        foreach ([
-                     'bot','crawl','spider','slurp',
-                     'telegrambot','whatsapp','discordbot',
-                     'facebookexternalhit','bingpreview',
-                     'yandex','baidu'
-                 ] as $bot) {
-            if (str_contains($ua, $bot)) {
-                return 'bot';
-            }
-        }
-
-        return 'human';
+        return request()->cookie('fp')
+            ?? sha1(Request::ip() . Request::userAgent());
     }
 
-    /* fingerprint */
-    protected static function fingerprint(): ?string
-    {
-        return request()->cookie('fp');
-    }
+    /* ========= Page Key ========= */
 
-    /* page_key جنرال */
     public static function resolvePageKey(): string
     {
         $route = request()->route();
 
-        if ($route) {
-            foreach ($route->parameters() as $param) {
-                if ($param instanceof Model) {
-                    return Str::snake(class_basename($param)) . ':' . $param->getRouteKey();
-                }
+        if (!$route) {
+            return 'page:' . trim(request()->path(), '/');
+        }
+
+        foreach ($route->parameters() as $param) {
+
+            // Model binding
+            if (is_object($param) && isset($param->id)) {
+                return Str::snake(class_basename($param)) . ':' . $param->getRouteKey();
             }
 
-            if ($route->getName()) {
-                return 'route:' . $route->getName();
+            // numeric or slug param
+            if (is_numeric($param) || is_string($param)) {
+                return $route->getName()
+                    ? $route->getName() . ':' . $param
+                    : 'path:' . trim(request()->path(), '/');
             }
         }
 
-        return 'page:' . trim(request()->path(), '/');
+        return $route->getName()
+            ? 'route:' . $route->getName()
+            : 'page:' . trim(request()->path(), '/');
     }
 
-    /* ثبت بازدید */
-    public static function register(): void
-    {
-        $visitorType = self::detectVisitorType();
-        $pageKey     = self::resolvePageKey();
-        $today       = now()->toDateString();
-        $fingerprint = self::fingerprint();
+    /* ========= Record Visit ========= */
 
-        if ($visitorType === 'human' && !$fingerprint) {
+    public static function record(): void
+    {
+        $agent = new Agent();
+
+        if ($agent->isRobot()) {
             return;
         }
 
-        PageVisit::firstOrCreate(
-            [
-                'page_key'   => $pageKey,
-                'fingerprint'=> $visitorType === 'human' ? $fingerprint : null,
-                'visit_date' => $today,
-            ],
-            [
-                'visitor_type' => $visitorType,
-                'ip'           => request()->ip(),
-                'user_agent'   => request()->userAgent(),
-            ]
-        );
+        $fingerprint = self::resolveFingerprint();
+        $pageKey     = self::resolvePageKey();
+
+        $exists = PageVisit::query()
+            ->where('page_key', $pageKey)
+            ->where('fingerprint', $fingerprint)
+            ->whereDate('created_at', now()->toDateString())
+            ->exists();
+
+        if ($exists) {
+            return;
+        }
+
+        PageVisit::create([
+            'page_key'    => $pageKey,
+            'fingerprint' => $fingerprint,
+            'user_id'     => Auth::id(),
+            'ip'          => Request::ip(),
+            'user_agent'  => Request::userAgent(),
+            'is_bot'      => false,
+        ]);
     }
 
-    /* شمارش بازدید انسانی */
+    /* ========= Count ========= */
+
     public static function countHuman(string $pageKey): int
     {
         return PageVisit::where('page_key', $pageKey)
-            ->where('visitor_type', 'human')
+            ->where('is_bot', false)
             ->count();
     }
 }
