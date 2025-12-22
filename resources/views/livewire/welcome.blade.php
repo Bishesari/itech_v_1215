@@ -10,14 +10,6 @@ new
 #[Title('آموزشگاه کامپیوتر، حسابداری، معماری و عکاسی در بوشهر | دوره‌های مهارتی')]
 class extends Component {
 
-    public int $visits = 0;
-
-    public function mount(): void
-    {
-        PageVisitHelper::register('home');
-        // گرفتن تعداد بازدید
-        $this->visits = PageVisitHelper::count('home');
-    }
 }; ?>
 
 <div>
