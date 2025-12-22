@@ -67,9 +67,7 @@
                 screen.width + 'x' + screen.height,
                 screen.colorDepth,
                 Intl.DateTimeFormat().resolvedOptions().timeZone,
-                navigator.platform,
                 navigator.hardwareConcurrency,
-                navigator.deviceMemory || ''
             ].join('|');
 
             crypto.subtle.digest('SHA-256', new TextEncoder().encode(data))
