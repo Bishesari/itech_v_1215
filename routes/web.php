@@ -29,5 +29,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('two-factor.show');
     Volt::route('select_role', 'auth.select-role')->name('select_role');
 });
-Volt::route('forgotten-password', 'auth.my-forgot-password')
-    ->name('forgotten.password');
+
+Volt::route('forgotten-password', 'auth.my-forgot-password')->name('forgotten.password');
+
+
+Volt::route('provinces', 'province.index')->name('province.index');
