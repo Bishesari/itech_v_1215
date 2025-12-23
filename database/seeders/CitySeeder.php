@@ -14,80 +14,10 @@ class CitySeeder extends Seeder
     public function run(): void
     {
         $cities = [
-            // تهران
-            'Tehran' => [
-                ['تهران', 'Tehran'],
-                ['شهریار', 'Shahriar'],
-                ['ری', 'Ray'],
-                ['اسلامشهر', 'Eslamshahr'],
-            ],
-
-            // اصفهان
-            'Isfahan' => [
-                ['اصفهان', 'Isfahan'],
-                ['کاشان', 'Kashan'],
-                ['نجف‌آباد', 'Najafabad'],
-            ],
-
-            // فارس
-            'Fars' => [
-                ['شیراز', 'Shiraz'],
-                ['مرودشت', 'Marvdasht'],
-                ['جهرم', 'Jahrom'],
-            ],
-
             // بوشهر
             'Bushehr' => [
-                ['بوشهر', 'Bushehr'],
-                ['برازجان', 'Borazjan'],
-                ['بندر گناوه', 'Bandar Ganaveh'],
-                ['بندر کنگان', 'Bandar Kangan'],
-                ['خورموج', 'Khormoj'],
-                ['جم', 'Jam'],
-                ['بندردیلم', 'Bandar Deylam'],
-                ['بندردیر', 'Bandar-e Deyr'],
-                ['علی‌شهر', 'Ali Shahr'],
-                ['آب‌پخش', 'Ab Pakhsh'],
-                ['نخل تقی', 'Nakhl Taqi'],
-                ['چغادک', 'Choghadak'],
-                ['اهرم', 'Ahram'],
-                ['بانک', 'Banak'],
-                ['عسلویه', 'Asaluyeh'],
-                ['کاکی', 'Kaki'],
-                ['وحدتیه', 'Vahdatiyeh'],
-                ['سعدآباد', 'Sadabad'],
-                ['خارگ', 'Kharg'],
-                ['شبانکاره', 'Shabankareh'],
-                ['بردستان', 'Bardestan'],
-                ['بندر سیراف', 'Bandar Siraf'],
-                ['آبدان', 'Abdan'],
-                ['دالکی', 'Dalaki'],
-                ['بندر ریگ', 'Bandar Rig'],
-                ['بردخون', 'Bord Khun'],
-                ['دوراهک', 'Dowrahak'],
-                ['دلوار', 'Delvar'],
-                ['بادوله', 'Baduleh'],
-                ['آناهستان', 'Anarestan'],
-                ['ریز', 'Riz'],
-                ['تنگ ارم', 'Tang-e Eram'],
-            ],
-
-
-            // البرز
-            'Alborz' => [
-                ['کرج', 'Karaj'],
-                ['فردیس', 'Fardis'],
-                ['نظرآباد', 'Nazarabad'],
-                ['هشتگرد', 'Hashtgerd'],
-                ['محمدشهر', 'Mohammadshahr'],
-                ['ماهدشت', 'Mahdasht'],
-                ['کمال‌شهر', 'Kamal Shahr'],
-                ['گرمدره', 'Garmdareh'],
-                ['مشکین‌دشت', 'Meshkin Dasht'],
-                ['طالقان', 'Taleqan'],
-                ['تنکمان', 'Tankaman'],
-                ['کوهسار', 'Koohsar'],
-            ],
+                ['بندر بوشهر', 'Bandar-Bushehr'],
+            ]
         ];
 
         foreach ($cities as $provinceEn => $cityList) {

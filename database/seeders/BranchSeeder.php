@@ -15,7 +15,7 @@ class BranchSeeder extends Seeder
         Branch::create([
             'name' => 'مرکزی بوشهر',
             'code' => 'BUS-001',
-            'province_id' => 3,
+            'province_id' => 1,
             'city_id' => 1,
             'address' => 'خیابان سنگی، ابتدای کوچه گلخانه، نبش بهشت1، ساختمان سیراف5، طبقه اول، واحد 3',
             'postal_code' => '7514977863',
