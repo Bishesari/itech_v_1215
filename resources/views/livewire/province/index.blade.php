@@ -29,7 +29,7 @@ new class extends Component {
         return Province::query()
             ->withCount('cities') // حتی اگر صفر باشد، استان حذف نمی‌شود
             ->orderBy($this->sortBy, $this->sortDirection)
-            ->paginate(10);
+            ->paginate(8);
     }
 
 }; ?>
