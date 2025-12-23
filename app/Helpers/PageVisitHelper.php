@@ -89,4 +89,5 @@ class PageVisitHelper
             ->where('is_bot', false)
             ->count();
     }
+
 }

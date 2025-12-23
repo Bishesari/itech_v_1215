@@ -1,9 +1,14 @@
 @php
-    // صفحه فعلی را شناسایی می‌کنیم
-    $pageKey = \App\Helpers\PageVisitHelper::resolvePageKey();
+    use App\Helpers\PageVisitHelper;
 
-    // تعداد بازدیدهای انسانی (غیر bot) را می‌گیریم
-    $visits = \App\Helpers\PageVisitHelper::countHuman($pageKey);
+        // ثبت بازدید (اگر امروز قبلاً ثبت نشده)
+        PageVisitHelper::record();
+
+        // کلید یکتای صفحه
+        $pageKey = PageVisitHelper::resolvePageKey();
+
+        // تعداد بازدید انسانی
+        $visits = PageVisitHelper::countHuman($pageKey);
 @endphp
 <flux:footer
     class="bg-zinc-50 grid grid-cols-1 md:grid-cols-2 dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-700">
