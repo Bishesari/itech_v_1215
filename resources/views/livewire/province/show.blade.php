@@ -3,6 +3,7 @@
 use App\Models\City;
 use App\Models\Province;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
 
@@ -34,6 +35,14 @@ new class extends Component {
             ->paginate(12);
     }
 
+    #[On('city-created')]
+    #[On('city-updated')]
+    #[On('city-deleted')]
+    public function refreshList(): void
+    {
+        $this->resetPage();
+    }
+
 
 }; ?>
 
@@ -44,13 +53,13 @@ new class extends Component {
 
     <div class="inline-flex mt-2 mb-4">
         <flux:breadcrumbs>
-        <flux:breadcrumbs.item href="{{route('province.index')}}">{{__('استان')}}</flux:breadcrumbs.item>
-        <flux:breadcrumbs.item>{{$province->name_fa}}</flux:breadcrumbs.item>
-    </flux:breadcrumbs>
+            <flux:breadcrumbs.item href="{{route('province.index')}}">{{__('استان')}}</flux:breadcrumbs.item>
+            <flux:breadcrumbs.item>{{$province->name_fa}}</flux:breadcrumbs.item>
+        </flux:breadcrumbs>
 
 
-    <livewire:province.create />
-</div>
+        <livewire:province.city.create :$province/>
+    </div>
 
     <flux:separator variant="subtle"/>
 
@@ -74,7 +83,6 @@ new class extends Component {
                                wire:click="sort('updated_at')">
                 {{__('زمان ویرایش')}}
             </flux:table.column>
-
 
 
             <flux:table.column>{{ __('عملیات') }}</flux:table.column>
@@ -102,7 +110,6 @@ new class extends Component {
                         <div>{{ explode(' ', $city->jalali_updated_at)[0] }}</div>
                         <div class="text-xs">{{ substr($city->jalali_updated_at, 11, 5) }}</div>
                     </flux:table.cell>
-
 
 
                     <flux:table.cell>

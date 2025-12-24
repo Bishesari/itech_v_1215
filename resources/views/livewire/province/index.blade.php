@@ -68,6 +68,9 @@ new class extends Component {
                                wire:click="sort('name_en')">{{__('Province')}}</flux:table.column>
             <flux:table.column>{{__('تعداد شهرها')}}</flux:table.column>
 
+            <flux:table.column>{{__('فعال')}}</flux:table.column>
+
+
             <flux:table.column sortable :sorted="$sortBy === 'created_at'" :direction="$sortDirection"
                                wire:click="sort('created_at')">
                 {{__('زمان ثبت')}}
@@ -93,6 +96,8 @@ new class extends Component {
                         <flux:badge color="green" size="sm"
                                     inset="top bottom">{{ $province->cities_count }}</flux:badge>
                     </flux:table.cell>
+
+                    <flux:table.cell>{{ $province->is_active }}</flux:table.cell>
 
                     <flux:table.cell class="whitespace-nowrap">
                         <div class="leading-tight">
