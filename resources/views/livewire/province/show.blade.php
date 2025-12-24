@@ -57,7 +57,25 @@ new class extends Component {
     <flux:table :paginate="$this->cities" class="inline">
         <flux:table.columns>
             <flux:table.column>{{__('#')}}</flux:table.column>
-            <flux:table.column sortable :sorted="$sortBy === 'name_fa'" :direction="$sortDirection" wire:click="sort('name_fa')">{{__('شهر')}}</flux:table.column>
+            <flux:table.column sortable :sorted="$sortBy === 'name_fa'" :direction="$sortDirection"
+                               wire:click="sort('name_fa')">
+                {{__('استان')}}
+            </flux:table.column>
+            <flux:table.column sortable :sorted="$sortBy === 'name_en'" :direction="$sortDirection"
+                               wire:click="sort('name_en')">{{__('Province')}}</flux:table.column>
+            <flux:table.column>{{__('تعداد شهرها')}}</flux:table.column>
+
+            <flux:table.column sortable :sorted="$sortBy === 'created_at'" :direction="$sortDirection"
+                               wire:click="sort('created_at')">
+                {{__('زمان ثبت')}}
+            </flux:table.column>
+
+            <flux:table.column align="center" sortable :sorted="$sortBy === 'updated_at'" :direction="$sortDirection"
+                               wire:click="sort('updated_at')">
+                {{__('زمان ویرایش')}}
+            </flux:table.column>
+
+
 
             <flux:table.column>{{ __('عملیات') }}</flux:table.column>
         </flux:table.columns>
@@ -67,6 +85,32 @@ new class extends Component {
                 <flux:table.row>
                     <flux:table.cell>{{ $city->id }}</flux:table.cell>
                     <flux:table.cell>{{ $city->name_fa }}</flux:table.cell>
+                    <flux:table.cell>{{ $city->name_en }}</flux:table.cell>
+                    <flux:table.cell class="text-center">
+                        <flux:badge color="green" size="sm"
+                                    inset="top bottom">{{ $city->cities_count }}</flux:badge>
+                    </flux:table.cell>
+
+                    <flux:table.cell class="whitespace-nowrap">
+                        <div class="leading-tight">
+                            <div>{{ explode(' ', $city->jalali_created_at)[0] }}</div>
+                            <div class="text-xs">{{ substr($city->jalali_created_at, 11, 5) }}</div>
+                        </div>
+                    </flux:table.cell>
+
+                    <flux:table.cell class="whitespace-nowrap">
+                        <div>{{ explode(' ', $city->jalali_updated_at)[0] }}</div>
+                        <div class="text-xs">{{ substr($city->jalali_updated_at, 11, 5) }}</div>
+                    </flux:table.cell>
+
+
+
+                    <flux:table.cell>
+                        <div class="inline-flex items-center gap-2">
+                            <livewire:province.city.edit :$city :key="'city-edit-'.$city->id"/>
+                            <livewire:province.city.delete :$city :key="'city-delete-'.$city->id"/>
+                        </div>
+                    </flux:table.cell>
                 </flux:table.row>
             @endforeach
         </flux:table.rows>
