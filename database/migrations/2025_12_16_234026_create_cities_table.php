@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('province_id')->constrained()->cascadeOnDelete();
             $table->string('name_fa', 30);   // بوشهر
             $table->string('name_en', 30)->index(); // bushehr
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
 
             $table->unique(['province_id', 'name_en']);

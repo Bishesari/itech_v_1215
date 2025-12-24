@@ -34,4 +34,4 @@ Volt::route('forgotten-password', 'auth.my-forgot-password')->name('forgotten.pa
 
 
 Volt::route('provinces', 'province.index')->name('province.index')->middleware(['auth']);
-Volt::route('province/{province}', 'province.show')->name('province.show');
+Volt::route('province/{province}', 'province.show')->name('province.show')->middleware(['auth']);

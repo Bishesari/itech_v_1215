@@ -97,7 +97,13 @@ new class extends Component {
                                     inset="top bottom">{{ $province->cities_count }}</flux:badge>
                     </flux:table.cell>
 
-                    <flux:table.cell>{{ $province->is_active }}</flux:table.cell>
+                    <flux:table.cell class="text-center">
+                        <flux:badge
+                            size="sm"
+                            color="{{ $province->is_active ? 'green' : 'red' }}">
+                            {{ $province->is_active ? 'فعال' : 'غیرفعال' }}
+                        </flux:badge>
+                    </flux:table.cell>
 
                     <flux:table.cell class="whitespace-nowrap">
                         <div class="leading-tight">

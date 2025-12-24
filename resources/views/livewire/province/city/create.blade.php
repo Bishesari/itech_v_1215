@@ -12,6 +12,11 @@ new class extends Component {
     public string $name_fa = '';
     public string $name_en = '';
 
+    public function mount()
+    {
+
+    }
+
     protected function rules(): array
     {
         return [
