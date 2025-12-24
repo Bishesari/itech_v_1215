@@ -26,7 +26,7 @@ new class extends Component {
 
         Flux::toast(
             heading: 'حذف شد.',
-            text: 'استان جدید با موفقیت حذف شد.',
+            text: 'شهر با موفقیت حذف شد.',
             variant: 'danger'
         );
     }
@@ -34,7 +34,7 @@ new class extends Component {
 }; ?>
 
 <div class="text-center">
-    <flux:tooltip content="حذف استان" position="bottom">
+    <flux:tooltip content="حذف شهر" position="bottom">
         <flux:icon.trash variant="micro" class="cursor-pointer size-5 text-red-500 dark:text-red-400"
                          x-on:click="$flux.modal('delete-city-{{ $city->id }}').show()"/>
     </flux:tooltip>
@@ -42,7 +42,7 @@ new class extends Component {
     <flux:modal name="delete-city-{{ $city->id }}" :show="$errors->isNotEmpty()" focusable class="md:w-96">
         <div class="space-y-6">
             <div>
-                <flux:heading size="lg">{{__('حذف استان ')}} <span
+                <flux:heading size="lg">{{__('حذف شهر ')}} <span
                         class="font-bold text-red-500 dark:text-red-400">{{ $city->name_fa }}</span></flux:heading>
                 <flux:text class="mt-2">{{__('با تایید حذف اطلاعات مربوطه حذف خواهند شد.')}}</flux:text>
             </div>

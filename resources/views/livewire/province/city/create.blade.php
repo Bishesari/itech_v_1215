@@ -43,7 +43,7 @@ new class extends Component {
 
     public function reset_prop(): void
     {
-        $this->reset();
+        $this->resetExcept('province');
         $this->resetErrorBag();
     }
 

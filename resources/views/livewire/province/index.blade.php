@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Province;
+use Flux\Flux;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;
@@ -33,6 +34,23 @@ new class extends Component {
             ->paginate(12);
     }
 
+    public function toggleStatus(int $provinceId): void
+    {
+        $province = Province::findOrFail($provinceId);
+
+        $province->update([
+            'is_active' => !$province->is_active,
+        ]);
+
+        $this->dispatch('province-updated');
+
+        Flux::toast(
+            heading: 'به‌روزرسانی شد',
+            text: 'وضعیت استان با موفقیت تغییر کرد.',
+            variant: 'warning'
+        );
+    }
+
     #[On('province-created')]
     #[On('province-updated')]
     #[On('province-deleted')]
@@ -41,8 +59,6 @@ new class extends Component {
         $this->resetPage();
     }
 }; ?>
-
-
 
 
 <div>
@@ -82,7 +98,6 @@ new class extends Component {
             </flux:table.column>
 
 
-
             <flux:table.column>{{ __('عملیات') }}</flux:table.column>
         </flux:table.columns>
         <flux:table.rows>
@@ -97,12 +112,22 @@ new class extends Component {
                                     inset="top bottom">{{ $province->cities_count }}</flux:badge>
                     </flux:table.cell>
 
-                    <flux:table.cell class="text-center">
-                        <flux:badge
-                            size="sm"
-                            color="{{ $province->is_active ? 'green' : 'red' }}">
-                            {{ $province->is_active ? 'فعال' : 'غیرفعال' }}
-                        </flux:badge>
+                    <flux:table.cell>
+                        <div class="inline-flex items-center gap-2">
+                            <flux:badge size="sm" color="{{ $province->is_active ? 'green' : 'red' }}">
+                                {{ $province->is_active ? 'فعال' : 'غیرفعال' }}
+                            </flux:badge>
+
+                            @php
+                                $checked = $province->is_active ? 'checked' : null;
+                            @endphp
+                            <flux:switch :$checked
+                                wire:key="province-switch-{{ $province->id }}-{{ $province->is_active }}"
+                                wire:click="toggleStatus({{ $province->id }})"
+                                wire:loading.attr="disabled"
+                            />
+
+                        </div>
                     </flux:table.cell>
 
                     <flux:table.cell class="whitespace-nowrap">
@@ -116,7 +141,6 @@ new class extends Component {
                         <div>{{ explode(' ', $province->jalali_updated_at)[0] }}</div>
                         <div class="text-xs">{{ substr($province->jalali_updated_at, 11, 5) }}</div>
                     </flux:table.cell>
-
 
 
                     <flux:table.cell>

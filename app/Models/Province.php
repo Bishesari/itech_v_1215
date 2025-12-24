@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Province extends Model
 {
     use HasJalaliDates;
-    protected $fillable = ['name_fa', 'name_en'];
+    protected $fillable = ['name_fa', 'name_en', 'is_active'];
     public function cities():HasMany
     {
         return $this->hasMany(City::class);

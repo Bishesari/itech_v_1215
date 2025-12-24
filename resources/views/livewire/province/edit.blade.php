@@ -61,13 +61,13 @@ new class extends Component {
             <div>
                 <flux:heading size="lg">{{__('ویرایش استان ')}} <span
                         class="font-bold text-yellow-500">{{ $province->name_fa }}</span></flux:heading>
-                <flux:text class="mt-2">{{__('اطلاعات استان جدید را وارد کنید.')}}</flux:text>
+                <flux:text class="mt-2">{{__('اطلاعات استان را جهت ویرایش وارد کنید.')}}</flux:text>
             </div>
 
             <form wire:submit.prevent="update_province" class="space-y-4 flex flex-col gap-3" autocomplete="off">
-                <x-my.flt_lbl name="name_fa" label="{{__('نام استان فارسی:')}}" maxlength="40"
+                <x-my.flt_lbl name="name_fa" label="{{__('نام شهر فارسی:')}}" maxlength="40"
                               class="tracking-wider font-semibold" autofocus required/>
-                <x-my.flt_lbl name="name_en" label="{{__('نام استان لاتین:')}}" dir="ltr" maxlength="40"
+                <x-my.flt_lbl name="name_en" label="{{__('نام شهر لاتین:')}}" dir="ltr" maxlength="40"
                               class="tracking-wider font-semibold" required/>
 
                 <div class="flex">

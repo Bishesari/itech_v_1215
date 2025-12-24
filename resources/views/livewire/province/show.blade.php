@@ -2,6 +2,7 @@
 
 use App\Models\City;
 use App\Models\Province;
+use Flux\Flux;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;
@@ -35,6 +36,23 @@ new class extends Component {
             ->paginate(12);
     }
 
+    public function toggleStatus(int $cityId): void
+    {
+        $city = City::findOrFail($cityId);
+
+        $city->update([
+            'is_active' => !$city->is_active,
+        ]);
+
+        $this->dispatch('city-updated');
+
+        Flux::toast(
+            heading: 'به‌روزرسانی شد',
+            text: 'وضعیت شهر با موفقیت تغییر کرد.',
+            variant: 'warning'
+        );
+    }
+
     #[On('city-created')]
     #[On('city-updated')]
     #[On('city-deleted')]
@@ -66,10 +84,10 @@ new class extends Component {
             <flux:table.column>{{__('#')}}</flux:table.column>
             <flux:table.column sortable :sorted="$sortBy === 'name_fa'" :direction="$sortDirection"
                                wire:click="sort('name_fa')">
-                {{__('استان')}}
+                {{__('شهر')}}
             </flux:table.column>
             <flux:table.column sortable :sorted="$sortBy === 'name_en'" :direction="$sortDirection"
-                               wire:click="sort('name_en')">{{__('Province')}}</flux:table.column>
+                               wire:click="sort('name_en')">{{__('City')}}</flux:table.column>
             <flux:table.column>{{__('فعال')}}</flux:table.column>
 
             <flux:table.column sortable :sorted="$sortBy === 'created_at'" :direction="$sortDirection"
@@ -92,12 +110,24 @@ new class extends Component {
                     <flux:table.cell>{{ $city->id }}</flux:table.cell>
                     <flux:table.cell>{{ $city->name_fa }}</flux:table.cell>
                     <flux:table.cell>{{ $city->name_en }}</flux:table.cell>
-                    <flux:table.cell class="text-center">
-                        <flux:badge
-                            size="sm"
-                            color="{{ $city->is_active ? 'green' : 'red' }}">
-                            {{ $city->is_active ? 'فعال' : 'غیرفعال' }}
-                        </flux:badge>
+
+
+                    <flux:table.cell>
+                        <div class="inline-flex items-center gap-2">
+                            <flux:badge size="sm" color="{{ $city->is_active ? 'green' : 'red' }}">
+                                {{ $city->is_active ? 'فعال' : 'غیرفعال' }}
+                            </flux:badge>
+
+                            @php
+                                $checked = $city->is_active ? 'checked' : null;
+                            @endphp
+                            <flux:switch :$checked
+                                         wire:key="province-switch-{{ $city->id }}-{{ $city->is_active }}"
+                                         wire:click="toggleStatus({{ $city->id }})"
+                                         wire:loading.attr="disabled"
+                            />
+
+                        </div>
                     </flux:table.cell>
 
                     <flux:table.cell class="whitespace-nowrap">

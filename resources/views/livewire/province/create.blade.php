@@ -38,8 +38,6 @@ new class extends Component {
         $this->resetErrorBag();
     }
 
-
-
 }; ?>
 
 <div>

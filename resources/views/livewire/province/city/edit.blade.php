@@ -15,16 +15,8 @@ new class extends Component {
     protected function rules(): array
     {
         return [
-            'name_fa' => [
-                'required',
-                'min:2',
-                Rule::unique('cities', 'name_fa')->ignore($this->city),
-            ],
-            'name_en' => [
-                'required',
-                'min:2',
-                Rule::unique('cities', 'name_en')->ignore($this->city),
-            ],
+            'name_fa' => ['required', 'min:2', Rule::unique('cities', 'name_fa')->ignore($this->city)],
+            'name_en' => ['required', 'min:2', Rule::unique('cities', 'name_en')->ignore($this->city)],
         ];
     }
 
@@ -51,7 +43,7 @@ new class extends Component {
 }; ?>
 
 <div>
-    <flux:tooltip content="ویرایش استان" position="bottom">
+    <flux:tooltip content="ویرایش شهر" position="bottom">
         <flux:icon.pencil-square variant="micro" class="cursor-pointer size-5 text-yellow-500"
                                  x-on:click="$flux.modal('edit-city-{{ $city->id }}').show()"/>
     </flux:tooltip>
@@ -60,9 +52,9 @@ new class extends Component {
                 :dismissible="false">
         <div class="space-y-6">
             <div>
-                <flux:heading size="lg">{{__('ویرایش استان ')}} <span
+                <flux:heading size="lg">{{__('ویرایش شهر ')}} <span
                         class="font-bold text-yellow-500">{{ $city->name_fa }}</span></flux:heading>
-                <flux:text class="mt-2">{{__('اطلاعات استان جدید را وارد کنید.')}}</flux:text>
+                <flux:text class="mt-2">{{__('اطلاعات شهر را جهت ویرایش را وارد کنید.')}}</flux:text>
             </div>
 
             <form wire:submit.prevent="update_city" class="space-y-4 flex flex-col gap-3" autocomplete="off">
