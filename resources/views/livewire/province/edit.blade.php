@@ -15,16 +15,8 @@ new class extends Component {
     protected function rules(): array
     {
         return [
-            'name_fa' => [
-                'required',
-                'min:2',
-                Rule::unique('provinces', 'name_fa')->ignore($this->province),
-            ],
-            'name_en' => [
-                'required',
-                'min:2',
-                Rule::unique('provinces', 'name_en')->ignore($this->province),
-            ],
+            'name_fa' => ['required', 'min:2', Rule::unique('provinces', 'name_fa')->ignore($this->province)],
+            'name_en' => ['required', 'min:2', Rule::unique('provinces', 'name_en')->ignore($this->province)],
         ];
     }
 
@@ -33,7 +25,6 @@ new class extends Component {
         $this->name_fa = $this->province->name_fa;
         $this->name_en = $this->province->name_en;
     }
-
 
     public function update_province(): void
     {

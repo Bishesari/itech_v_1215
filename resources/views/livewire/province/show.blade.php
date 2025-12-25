@@ -54,11 +54,16 @@ new class extends Component {
     }
 
     #[On('city-created')]
-    #[On('city-updated')]
-    #[On('city-deleted')]
     public function refreshList(): void
     {
         $this->resetPage();
+    }
+
+    #[On('city-updated')]
+    #[On('city-deleted')]
+    public function roleChanged(): void
+    {
+        $this->dispatch('$refresh');
     }
 
 

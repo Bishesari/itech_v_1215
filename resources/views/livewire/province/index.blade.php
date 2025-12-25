@@ -52,11 +52,16 @@ new class extends Component {
     }
 
     #[On('province-created')]
-    #[On('province-updated')]
-    #[On('province-deleted')]
     public function refreshList(): void
     {
         $this->resetPage();
+    }
+
+    #[On('province-updated')]
+    #[On('province-deleted')]
+    public function roleChanged(): void
+    {
+        $this->dispatch('$refresh');
     }
 }; ?>
 
