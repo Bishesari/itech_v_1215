@@ -13,20 +13,24 @@ return new class extends Migration
     {
         Schema::create('branches', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 30);                 // مرکزی بوشهر
-            $table->string('code', 7)->unique();       // BUS-001
+            $table->string('code', 7)->unique();
+            $table->string('short_name', 30);
+            $table->string('full_name', 50);
+            $table->char('abbr', 3)->unique();
 
             $table->foreignId('province_id')->constrained()->cascadeOnDelete();
             $table->foreignId('city_id')->constrained()->cascadeOnDelete();
 
-            $table->string('address', 150)->nullable();  // آدرس کامل
-            $table->string('postal_code', 10)->nullable();
+            $table->string('address', 150)->nullable();
+            $table->string('postal_code', 10)->nullable()->index();
 
-            $table->string('phone', 11)->nullable();
-            $table->string('mobile', 11)->nullable();
+            $table->string('phone', 15)->nullable();
+            $table->string('mobile', 15)->nullable();
 
-            $table->decimal('remain_credit', 12, 0)->default(0);
-            $table->boolean('is_active')->default(true);
+            $table->unsignedBigInteger('credit_balance')->default(0);
+
+            $table->boolean('is_active')->default(true)->index();
+
             $table->timestamps();
         });
     }

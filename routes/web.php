@@ -37,3 +37,5 @@ Volt::route('provinces', 'province.index')->name('province.index')->middleware([
 Volt::route('province/{province}', 'province.show')->name('province.show')->middleware(['auth']);
 
 Volt::route('roles', 'role.index')->name('role.index')->middleware(['auth']);
+
+Volt::route('branches', 'branch.index')->name('branch.index')->middleware(['auth']);
