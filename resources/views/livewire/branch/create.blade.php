@@ -46,24 +46,29 @@ new class extends Component {
 }; ?>
 
 <div>
-    <div class="space-y-6">
-            <div>
-                <flux:heading size="lg">{{__('درج شهر جدید')}}</flux:heading>
-                <flux:text class="mt-2">{{__('اطلاعات شهر جدید را وارد کنید.')}}</flux:text>
-            </div>
+    <flux:heading size="lg" level="1">
+        {{__('اطلاعات پایه')}}
+    </flux:heading>
 
-            <form wire:submit.prevent="save" class="space-y-4 flex flex-col gap-3" autocomplete="off">
-                <x-my.flt_lbl name="name_fa" label="{{__('نام شهر فارسی:')}}" maxlength="40"
-                              class="tracking-wider font-semibold" autofocus required/>
-                <x-my.flt_lbl name="name_en" label="{{__('نام شهر لاتین:')}}" dir="ltr" maxlength="40"
-                              class="tracking-wider font-semibold" required/>
+    <div class="inline-flex mt-2 mb-4">
+        <flux:breadcrumbs>
+            <flux:breadcrumbs.item href="{{route('branch.index')}}">{{__('شعبه')}}</flux:breadcrumbs.item>
+            <flux:breadcrumbs.item>{{__('جدید')}}</flux:breadcrumbs.item>
+        </flux:breadcrumbs>
+    </div>
 
-                <div class="flex">
-                    <flux:spacer/>
-                    <flux:button type="submit" variant="primary" color="teal" size="sm"
-                                 class="cursor-pointer">{{__('ثبت')}}</flux:button>
-                </div>
-            </form>
+    <flux:separator variant="subtle"/>
+
+    <form wire:submit.prevent="save" class="grid mt-5 w-[350px] gap-y-4" autocomplete="off" autofocus>
+        <x-my.flt_lbl name="name_fa" label="{{__('نام شهر فارسی:')}}" maxlength="40"
+                      class="tracking-wider font-semibold" autofocus required/>
+        <x-my.flt_lbl name="name_en" label="{{__('نام شهر لاتین:')}}" dir="ltr" maxlength="40"
+                      class="tracking-wider font-semibold" required/>
+
+        <div class="flex">
+            <flux:spacer/>
+            <flux:button type="submit" variant="primary" color="teal"
+                         class="cursor-pointer">{{__('ثبت')}}</flux:button>
         </div>
-
+    </form>
 </div>
