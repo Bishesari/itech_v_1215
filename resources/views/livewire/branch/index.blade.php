@@ -62,6 +62,13 @@ new class extends Component {
 
     <div class="inline-flex mt-2 mb-4">
         <flux:text>{{__('شعبه ها')}}</flux:text>
+        <flux:tooltip content="شعبه جدید" position="left">
+            <flux:link href="{{route('branch.create')}}" wire:navigate>
+                <flux:icon.plus-circle variant="micro" class="size-5 text-blue-500 mr-3"/>
+            </flux:link>
+
+        </flux:tooltip>
+
 {{--        <livewire:province.create/>--}}
     </div>
 
@@ -82,9 +89,6 @@ new class extends Component {
                                wire:click="sort('short_name')">{{__('نام کوتاه')}}
             </flux:table.column>
 
-            <flux:table.column sortable :sorted="$sortBy === 'full_name'" :direction="$sortDirection"
-                               wire:click="sort('full_name')">{{__('نام کامل')}}
-            </flux:table.column>
 
             <flux:table.column sortable :sorted="$sortBy === 'abbr'" :direction="$sortDirection"
                                wire:click="sort('abbr')">{{__('نام اختصاری')}}
@@ -98,8 +102,6 @@ new class extends Component {
                                wire:click="sort('city')">{{__('شهر')}}
             </flux:table.column>
 
-            <flux:table.column>{{__('آدرس')}}</flux:table.column>
-            <flux:table.column>{{__('کدپستی')}}</flux:table.column>
             <flux:table.column>{{__('تلفن')}}</flux:table.column>
             <flux:table.column>{{__('موبایل')}}</flux:table.column>
 
@@ -123,24 +125,35 @@ new class extends Component {
 
             @foreach ($this->branches as $branch)
                 <flux:table.row>
-                    <flux:table.cell>{{ $branch->id }}</flux:table.cell>
+                    <flux:table.cell>
+                        <flux:heading class="flex items-center gap-1">
+                            {{$branch->id}}
+                            <flux:tooltip toggleable position="left">
+                                <flux:button icon="information-circle" size="sm" variant="ghost" class="cursor-pointer"/>
+                                <flux:tooltip.content class="max-w-[20rem] space-y-2">
+                                    <p class="text-justify">{{__('نام کامل: ')}}{{ $branch->full_name }}</p>
+                                    <p class="text-justify">{{__('آدرس: ')}}{{ $branch->address }}</p>
+                                    <p class="text-justify">{{__('کدپستی: ')}}{{ $branch->postal_code }}</p>
+                                </flux:tooltip.content>
+                            </flux:tooltip>
+                        </flux:heading>
+                    </flux:table.cell>
                     <flux:table.cell>{{ $branch->code }}</flux:table.cell>
                     <flux:table.cell>{{ $branch->short_name }}</flux:table.cell>
-                    <flux:table.cell>{{ $branch->full_name }}</flux:table.cell>
+
+{{--                    <flux:table.cell class="max-w-32">--}}
+{{--                        <flux:tooltip content="{{ $branch->full_name }}">--}}
+{{--                            <flux:text class="truncate">{{ $branch->full_name }}</flux:text>--}}
+{{--                        </flux:tooltip>--}}
+{{--                    </flux:table.cell>--}}
+
                     <flux:table.cell>{{ $branch->abbr }}</flux:table.cell>
                     <flux:table.cell>{{ $branch->province->name_fa }}</flux:table.cell>
                     <flux:table.cell>{{ $branch->city->name_fa }}</flux:table.cell>
 
-                    <flux:table.cell class="max-w-40">
-                        <flux:tooltip content="{{ $branch->address }}">
-                            <flux:text class="truncate">{{ $branch->address }}</flux:text>
-                        </flux:tooltip>
-                    </flux:table.cell>
-
-                    <flux:table.cell>{{ $branch->postal_code }}</flux:table.cell>
                     <flux:table.cell>{{ $branch->phone }}</flux:table.cell>
                     <flux:table.cell>{{ $branch->mobile }}</flux:table.cell>
-                    <flux:table.cell>{{ $branch->credit_balance }}</flux:table.cell>
+                    <flux:table.cell><span dir="ltr">{{ number_format( $branch->credit_balance,0,"."," / ") }}</span></flux:table.cell>
 
                     <flux:table.cell>
                         <div class="inline-flex items-center gap-2">

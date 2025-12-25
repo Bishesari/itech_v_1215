@@ -1,14 +1,14 @@
 <?php
 
+use App\Models\Branch;
 use App\Models\City;
-use App\Models\Province;
 use Flux\Flux;
 use Illuminate\Validation\Rule;
 use Livewire\Volt\Component;
 
 new class extends Component {
 
-    public Province $province;
+    public Branch $branch;
     public string $name_fa = '';
     public string $name_en = '';
 
@@ -46,14 +46,7 @@ new class extends Component {
 }; ?>
 
 <div>
-    <flux:tooltip content="شهر جدید" position="left">
-        <flux:icon.plus-circle variant="micro" class="cursor-pointer size-5 text-blue-500 mr-4"
-                               x-on:click="$flux.modal('new-city').show()"/>
-    </flux:tooltip>
-
-    <flux:modal name="new-city" :show="$errors->isNotEmpty()" focusable class="md:w-96" @close="reset_prop"
-                :dismissible="false">
-        <div class="space-y-6">
+    <div class="space-y-6">
             <div>
                 <flux:heading size="lg">{{__('درج شهر جدید')}}</flux:heading>
                 <flux:text class="mt-2">{{__('اطلاعات شهر جدید را وارد کنید.')}}</flux:text>
@@ -72,5 +65,5 @@ new class extends Component {
                 </div>
             </form>
         </div>
-    </flux:modal>
+
 </div>

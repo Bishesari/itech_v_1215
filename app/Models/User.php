@@ -49,7 +49,7 @@ class User extends Authenticatable
             ->leftJoin('branches', 'branch_role_user.branch_id', '=', 'branches.id')
             ->where('branch_role_user.user_id', $this->id)
             ->select(
-                'roles.id as role_id', 'roles.name_fa as role_name', 'branches.id as branch_id', 'branches.name as branch_name'
+                'roles.id as role_id', 'roles.name_fa as role_name', 'branches.id as branch_id', 'branches.short_name as branch_name'
             )
             ->get();
     }
