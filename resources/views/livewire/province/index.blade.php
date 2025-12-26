@@ -59,7 +59,7 @@ new class extends Component {
 
     #[On('province-updated')]
     #[On('province-deleted')]
-    public function roleChanged(): void
+    public function provinceChanged(): void
     {
         $this->dispatch('$refresh');
     }
@@ -150,11 +150,13 @@ new class extends Component {
 
                     <flux:table.cell>
                         <div class="inline-flex items-center gap-2">
-                            <flux:link href="{{ route('province.show', $province) }}" variant="subtle" size="sm">
-                                {{ __('شهرها') }}
+                            <flux:link href="{{ route('province.show', $province) }}" variant="subtle" wire:navigate x-data="{ loading: false }" @click="loading = true">
+                                <span x-show="!loading" class="text-blue-500">{{ __('شهرها') }}</span>
+                                <flux:icon.loading x-show="loading" class="size-5 text-blue-500 mr-3"/>
                             </flux:link>
-                            <livewire:province.edit :$province :key="'province-edit-'.$province->id"/>
-                            <livewire:province.delete :$province :key="'province-delete-'.$province->id"/>
+
+                            <livewire:province.edit :province="$province" :key="'province-edit-'.$province->id"/>
+                            <livewire:province.delete :province="$province" :key="'province-delete-'.$province->id"/>
                         </div>
                     </flux:table.cell>
                 </flux:table.row>

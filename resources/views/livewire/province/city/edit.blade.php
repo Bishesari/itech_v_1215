@@ -52,8 +52,7 @@ new class extends Component {
                 :dismissible="false">
         <div class="space-y-6">
             <div>
-                <flux:heading size="lg">{{__('ویرایش شهر ')}} <span
-                        class="font-bold text-yellow-500">{{ $city->name_fa }}</span></flux:heading>
+                <flux:heading size="lg">{{__('ویرایش شهر ')}} <span  class="font-bold text-yellow-500">{{ $city->name_fa }}</span></flux:heading>
                 <flux:text class="mt-2">{{__('اطلاعات شهر را جهت ویرایش را وارد کنید.')}}</flux:text>
             </div>
 

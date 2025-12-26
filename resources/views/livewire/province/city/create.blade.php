@@ -8,10 +8,18 @@ use Livewire\Volt\Component;
 
 new class extends Component {
 
+    public $province_id;
     public Province $province;
+    public bool $show_btn = true;
+
     public string $name_fa = '';
     public string $name_en = '';
 
+    public function mount($province_id = null): void
+    {
+        $this->province_id = $province_id;
+        $this->province = Province::find($province_id);
+    }
     protected function rules(): array
     {
         return [
@@ -19,8 +27,6 @@ new class extends Component {
             'name_en' => ['required', 'min:2', Rule::unique('cities', 'name_en')],
         ];
     }
-
-
     public function save(): void
     {
         $validated = $this->validate();
@@ -38,7 +44,8 @@ new class extends Component {
 
     public function reset_prop(): void
     {
-        $this->resetExcept('province');
+        $this->reset('name_fa');
+        $this->reset('name_en');
         $this->resetErrorBag();
     }
 
@@ -46,16 +53,21 @@ new class extends Component {
 }; ?>
 
 <div>
-    <flux:tooltip content="شهر جدید" position="left">
-        <flux:icon.plus-circle variant="micro" class="cursor-pointer size-5 text-blue-500 mr-4"
-                               x-on:click="$flux.modal('new-city').show()"/>
-    </flux:tooltip>
-
+    @if($show_btn)
+        <flux:tooltip content="شهر جدید" position="left">
+            <flux:icon.plus-circle variant="micro" class="cursor-pointer size-5 text-blue-500 mr-4"
+                                   x-on:click="$flux.modal('new-city').show()"/>
+        </flux:tooltip>
+    @endif
     <flux:modal name="new-city" :show="$errors->isNotEmpty()" focusable class="md:w-96" @close="reset_prop"
                 :dismissible="false">
         <div class="space-y-6">
             <div>
-                <flux:heading size="lg">{{__('درج شهر جدید')}}</flux:heading>
+                <flux:heading size="lg">
+                    {{__('درج شهر جدید برای استان')}}
+                    <span class="font-bold text-blue-500">{{ $province->name_fa }}</span>
+
+                </flux:heading>
                 <flux:text class="mt-2">{{__('اطلاعات شهر جدید را وارد کنید.')}}</flux:text>
             </div>
 

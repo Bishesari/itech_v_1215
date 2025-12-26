@@ -10,6 +10,8 @@ new class extends Component {
     public string $name_fa = '';
     public string $name_en = '';
 
+    public bool $show_btn = true;
+
     protected function rules(): array
     {
         return [
@@ -34,17 +36,19 @@ new class extends Component {
 
     public function reset_prop(): void
     {
-        $this->reset();
+        $this->resetExcept('show_btn');
         $this->resetErrorBag();
     }
 
 }; ?>
 
 <div>
-    <flux:tooltip content="استان جدید" position="left">
-        <flux:icon.plus-circle variant="micro" class="cursor-pointer size-5 text-blue-500 mr-4"
-                               x-on:click="$flux.modal('new-province').show()"/>
-    </flux:tooltip>
+    @if($show_btn)
+        <flux:tooltip content="استان جدید" position="left">
+            <flux:icon.plus-circle variant="micro" class="cursor-pointer size-5 text-blue-500 mr-4"
+                                   x-on:click="$flux.modal('new-province').show()"/>
+        </flux:tooltip>
+    @endif
 
     <flux:modal name="new-province" :show="$errors->isNotEmpty()" focusable class="md:w-96" @close="reset_prop" :dismissible="false">
         <div class="space-y-6">

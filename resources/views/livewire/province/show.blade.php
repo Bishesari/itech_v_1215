@@ -61,7 +61,7 @@ new class extends Component {
 
     #[On('city-updated')]
     #[On('city-deleted')]
-    public function roleChanged(): void
+    public function cityChanged(): void
     {
         $this->dispatch('$refresh');
     }
@@ -82,7 +82,7 @@ new class extends Component {
             </flux:breadcrumbs.item>
             <flux:breadcrumbs.item>{{$province->name_fa}}</flux:breadcrumbs.item>
         </flux:breadcrumbs>
-        <livewire:province.city.create :province="$province"/>
+        <livewire:province.city.create :province_id="$province->id"/>
     </div>
 
     <flux:separator variant="subtle"/>

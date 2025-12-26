@@ -9,13 +9,11 @@ new class extends Component {
     public Province $province;
 
     public string $name_fa = '';
-    public string $name_en = '';
 
 
     public function mount(): void
     {
         $this->name_fa = $this->province->name_fa;
-        $this->name_en = $this->province->name_en;
     }
 
     public function delete_province(): void

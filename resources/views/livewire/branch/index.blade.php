@@ -2,6 +2,7 @@
 
 use App\Models\Branch;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
 
@@ -9,7 +10,7 @@ new class extends Component {
     use WithPagination;
 
     public string $sortBy = 'id';
-    public string $sortDirection = 'asc';
+    public string $sortDirection = 'desc';
 
     protected array $sortable = [
         'code',
@@ -34,6 +35,7 @@ new class extends Component {
     }
 
     #[Computed]
+    #[On('branch-deleted')]
     public function branches()
     {
         return Branch::query()
@@ -63,7 +65,8 @@ new class extends Component {
     <div class="inline-flex mt-2 mb-4">
         <flux:text>{{__('شعبه ها')}}</flux:text>
         <flux:tooltip content="شعبه جدید" position="left">
-            <flux:link href="{{ route('branch.create') }}" wire:navigate x-data="{ loading: false }" @click="loading = true">
+            <flux:link href="{{ route('branch.create') }}" wire:navigate x-data="{ loading: false }"
+                       @click="loading = true">
                 {{-- آیکن پلاس --}}
                 <flux:icon.plus-circle x-show="!loading" variant="micro" class="size-5 text-blue-500 mr-3"/>
                 {{-- لودر --}}
@@ -128,7 +131,8 @@ new class extends Component {
                         <flux:heading class="flex items-center gap-1">
                             {{$branch->id}}
                             <flux:tooltip toggleable position="left">
-                                <flux:button icon="information-circle" size="sm" variant="ghost" class="cursor-pointer"/>
+                                <flux:button icon="information-circle" size="sm" variant="ghost"
+                                             class="cursor-pointer"/>
                                 <flux:tooltip.content class="max-w-[20rem] space-y-2">
                                     <p class="text-justify">{{__('نام کامل: ')}}{{ $branch->full_name }}</p>
                                     <p class="text-justify">{{__('آدرس: ')}}{{ $branch->address }}</p>
@@ -146,7 +150,8 @@ new class extends Component {
 
                     <flux:table.cell>{{ $branch->phone }}</flux:table.cell>
                     <flux:table.cell>{{ $branch->mobile }}</flux:table.cell>
-                    <flux:table.cell><span dir="ltr">{{ number_format( $branch->credit_balance,0,"."," / ") }}</span></flux:table.cell>
+                    <flux:table.cell><span dir="ltr">{{ number_format( $branch->credit_balance,0,"."," / ") }}</span>
+                    </flux:table.cell>
 
                     <flux:table.cell>
                         <div class="inline-flex items-center gap-2">
@@ -178,13 +183,19 @@ new class extends Component {
                         <div class="text-xs">{{ substr($branch->jalali_updated_at, 11, 5) }}</div>
                     </flux:table.cell>
 
-
                     <flux:table.cell>
                         <div class="inline-flex items-center gap-2">
-{{--                            <livewire:province.edit :$province :key="'province-edit-'.$province->id"/>--}}
-{{--                            <livewire:province.delete :$province :key="'province-delete-'.$province->id"/>--}}
+                            <flux:link href="{{ route('branch.edit', $branch) }}" variant="subtle" wire:navigate
+                                       x-data="{ loading: false }" @click="loading = true">
+                                <flux:icon.pencil-square variant="micro" x-show="!loading"
+                                                         class="size-5 text-yellow-500"/>
+                                <flux:icon.loading x-show="loading" class="size-5 text-yellow-500"/>
+                            </flux:link>
+                            <livewire:branch.delete :branch="$branch" :key="'branch-delete-'.$branch->id"/>
+
                         </div>
                     </flux:table.cell>
+
                 </flux:table.row>
             @endforeach
         </flux:table.rows>
