@@ -55,7 +55,7 @@ new class extends Component {
 
 }; ?>
 
-<div>
+<div xmlns:flux="http://www.w3.org/1999/html">
     <flux:heading size="lg" level="1">
         {{__('اطلاعات پایه')}}
     </flux:heading>
@@ -63,13 +63,13 @@ new class extends Component {
     <div class="inline-flex mt-2 mb-4">
         <flux:text>{{__('شعبه ها')}}</flux:text>
         <flux:tooltip content="شعبه جدید" position="left">
-            <flux:link href="{{route('branch.create')}}" wire:navigate>
-                <flux:icon.plus-circle variant="micro" class="size-5 text-blue-500 mr-3"/>
+            <flux:link href="{{ route('branch.create') }}" wire:navigate x-data="{ loading: false }" @click="loading = true">
+                {{-- آیکن پلاس --}}
+                <flux:icon.plus-circle x-show="!loading" variant="micro" class="size-5 text-blue-500 mr-3"/>
+                {{-- لودر --}}
+                <flux:icon.loading x-show="loading" class="size-5 animate-spin text-blue-500 mr-3"/>
             </flux:link>
-
         </flux:tooltip>
-
-{{--        <livewire:province.create/>--}}
     </div>
 
     <flux:separator variant="subtle"/>
@@ -85,13 +85,12 @@ new class extends Component {
                                wire:click="sort('code')">{{__('کد شعبه')}}
             </flux:table.column>
 
-            <flux:table.column sortable :sorted="$sortBy === 'short_name'" :direction="$sortDirection"
-                               wire:click="sort('short_name')">{{__('نام کوتاه')}}
-            </flux:table.column>
-
-
             <flux:table.column sortable :sorted="$sortBy === 'abbr'" :direction="$sortDirection"
                                wire:click="sort('abbr')">{{__('نام اختصاری')}}
+            </flux:table.column>
+
+            <flux:table.column sortable :sorted="$sortBy === 'short_name'" :direction="$sortDirection"
+                               wire:click="sort('short_name')">{{__('نام کوتاه')}}
             </flux:table.column>
 
             <flux:table.column sortable :sorted="$sortBy === 'province'" :direction="$sortDirection"
@@ -139,15 +138,9 @@ new class extends Component {
                         </flux:heading>
                     </flux:table.cell>
                     <flux:table.cell>{{ $branch->code }}</flux:table.cell>
+                    <flux:table.cell>{{ $branch->abbr }}</flux:table.cell>
                     <flux:table.cell>{{ $branch->short_name }}</flux:table.cell>
 
-{{--                    <flux:table.cell class="max-w-32">--}}
-{{--                        <flux:tooltip content="{{ $branch->full_name }}">--}}
-{{--                            <flux:text class="truncate">{{ $branch->full_name }}</flux:text>--}}
-{{--                        </flux:tooltip>--}}
-{{--                    </flux:table.cell>--}}
-
-                    <flux:table.cell>{{ $branch->abbr }}</flux:table.cell>
                     <flux:table.cell>{{ $branch->province->name_fa }}</flux:table.cell>
                     <flux:table.cell>{{ $branch->city->name_fa }}</flux:table.cell>
 

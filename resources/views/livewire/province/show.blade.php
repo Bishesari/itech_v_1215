@@ -76,7 +76,10 @@ new class extends Component {
 
     <div class="inline-flex mt-2 mb-4">
         <flux:breadcrumbs>
-            <flux:breadcrumbs.item href="{{route('province.index')}}">{{__('استان')}}</flux:breadcrumbs.item>
+            <flux:breadcrumbs.item href="{{route('province.index')}}" wire:navigate x-data="{ loading: false }" @click="loading = true">
+                <span x-show="!loading" x-cloak class="text-blue-500">{{__('استان')}}</span>
+                <flux:icon.loading x-show="loading" x-cloak class="size-5 animate-spin text-blue-500 mr-3"/>
+            </flux:breadcrumbs.item>
             <flux:breadcrumbs.item>{{$province->name_fa}}</flux:breadcrumbs.item>
         </flux:breadcrumbs>
         <livewire:province.city.create :province="$province"/>

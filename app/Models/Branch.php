@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Branch extends Model
 {
     use HasJalaliDates;
-    protected $fillable = ['code', 'short_name', 'full_name', 'abb', 'province_id', 'city_id', 'address', 'postal_code', 'phone', 'mobile', 'remain_credit'];
+    protected $fillable = ['code', 'abbr', 'short_name', 'full_name', 'province_id', 'city_id', 'address', 'postal_code', 'phone', 'mobile', 'credit_balance'];
 
     public function province():BelongsTo
     {

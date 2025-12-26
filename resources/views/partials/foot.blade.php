@@ -52,7 +52,7 @@
             {{__('Yasser.Bishesari@Gmail.Com')}}
         </flux:text>
 
-        <flux:text class="pt-3">
+        <flux:text class="pt-3 text-green-500">
             {{__('S.V: 12.1.5 - L.V:')}}
             {{__(Illuminate\Foundation\Application::VERSION)}}
             {{__(' - PHP.V: '.PHP_VERSION)}}

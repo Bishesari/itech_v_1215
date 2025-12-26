@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('branches', function (Blueprint $table) {
             $table->id();
             $table->string('code', 7)->unique();
+            $table->char('abbr', 3)->unique();  //ITC
             $table->string('short_name', 30);
             $table->string('full_name', 50);
-            $table->char('abbr', 3)->unique();
 
             $table->foreignId('province_id')->constrained()->cascadeOnDelete();
             $table->foreignId('city_id')->constrained()->cascadeOnDelete();
@@ -27,8 +27,7 @@ return new class extends Migration
             $table->string('phone', 15)->nullable();
             $table->string('mobile', 15)->nullable();
 
-            $table->unsignedBigInteger('credit_balance')->default(0);
-
+            $table->unsignedBigInteger('credit_balance')->default(100);
             $table->boolean('is_active')->default(true)->index();
 
             $table->timestamps();

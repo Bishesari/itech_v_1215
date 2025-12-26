@@ -2,44 +2,83 @@
 
 use App\Models\Branch;
 use App\Models\City;
+use App\Models\Province;
 use Flux\Flux;
 use Illuminate\Validation\Rule;
+use Livewire\Attributes\Computed;
 use Livewire\Volt\Component;
 
 new class extends Component {
 
-    public Branch $branch;
-    public string $name_fa = '';
-    public string $name_en = '';
+    public string $code = '';
+    public string $abbr = '';
+    public string $short_name = '';
+    public string $full_name = '';
+
+    public int|string $province_id = '';
+    public int|string $city_id = '';
+
+    public string $address = '';
+    public string $postal_code = '';
+    public string $phone = '';
+    public string $mobile = '';
 
     protected function rules(): array
     {
         return [
-            'name_fa' => ['required', 'min:2', Rule::unique('cities', 'name_fa')],
-            'name_en' => ['required', 'min:2', Rule::unique('cities', 'name_en')],
+            'code' => ['required', 'size:7', Rule::unique('branches', 'code')],
+            'abbr' => ['required', 'size:3', Rule::unique('branches', 'abbr')],
+            'short_name' => ['required', 'min:2'],
+            'full_name' => ['required', 'min:3'],
+            'province_id' => ['required', 'exists:provinces,id'],
+            'city_id' => ['required', 'exists:cities,id'],
+            'address' => ['required', 'min:10'],
+            'postal_code' => ['required', 'digits:10'],
+            'phone' => ['required', 'digits:11', 'starts_with:0'],
+            'mobile' => ['required', 'digits:11', 'starts_with:09'],
         ];
     }
-
 
     public function save(): void
     {
         $validated = $this->validate();
-        $validated['province_id'] = $this->province->id;
-        City::create($validated);
-        $this->modal('new-city')->close();
-        $this->dispatch('city-created');
+
+        // نرمال‌سازی قبل از ذخیره
+        $validated['code'] = strtoupper($validated['code']);
+        $validated['abbr'] = strtoupper($validated['abbr']);
+
+        Branch::create($validated);
+        $this->dispatch('branch-created');
 
         Flux::toast(
             heading: 'ثبت شد.',
-            text: 'شهر جدید با موفقیت ثبت شد.',
+            text: 'شعبه جدید با موفقیت ثبت شد.',
             variant: 'success'
         );
+        $this->dispatch('branch-created');
     }
 
-    public function reset_prop(): void
+    #[Computed]
+    public function provinces()
     {
-        $this->resetExcept('province');
-        $this->resetErrorBag();
+        return Province::orderBy('name_fa')->get();
+    }
+
+    #[Computed]
+    public function cities()
+    {
+        if (!$this->province_id) {
+            return collect();
+        }
+
+        return City::where('province_id', $this->province_id)
+            ->orderBy('name_fa')
+            ->get();
+    }
+
+    public function updatedProvinceId(): void
+    {
+        $this->city_id = '';
     }
 
 
@@ -52,23 +91,76 @@ new class extends Component {
 
     <div class="inline-flex mt-2 mb-4">
         <flux:breadcrumbs>
-            <flux:breadcrumbs.item href="{{route('branch.index')}}">{{__('شعبه')}}</flux:breadcrumbs.item>
+            <flux:breadcrumbs.item href="{{route('branch.index')}}" wire:navigate x-data="{ loading: false }"
+                                   @click="loading = true">
+                <span x-show="!loading" class="text-blue-500">{{__('شعبه')}}</span>
+                <flux:icon.loading x-show="loading" class="size-5 animate-spin text-blue-500 mr-3"/>
+            </flux:breadcrumbs.item>
             <flux:breadcrumbs.item>{{__('جدید')}}</flux:breadcrumbs.item>
         </flux:breadcrumbs>
     </div>
 
     <flux:separator variant="subtle"/>
 
-    <form wire:submit.prevent="save" class="grid mt-5 w-[350px] gap-y-4" autocomplete="off" autofocus>
-        <x-my.flt_lbl name="name_fa" label="{{__('نام شهر فارسی:')}}" maxlength="40"
-                      class="tracking-wider font-semibold" autofocus required/>
-        <x-my.flt_lbl name="name_en" label="{{__('نام شهر لاتین:')}}" dir="ltr" maxlength="40"
+    <form wire:submit.prevent="save" class="grid mt-5 w-[400px] gap-y-4" autocomplete="off" autofocus>
+        <div class="grid grid-cols-2 gap-2">
+            <x-my.flt_lbl name="code" label="{{__('کد شعبه:')}}" dir="ltr" maxlength="7"
+                          class="tracking-wider font-semibold" autofocus required/>
+            <x-my.flt_lbl name="abbr" label="{{__('نام اختصاری:')}}" maxlength="3" class="font-semibold" required/>
+        </div>
+
+        <x-my.flt_lbl name="short_name" label="{{__('نام کوتاه:')}}" maxlength="30" class="font-semibold" required/>
+        <x-my.flt_lbl name="full_name" label="{{__('نام کامل:')}}" maxlength="30" class="font-semibold" required/>
+
+        <div class="grid grid-cols-2 gap-2">
+            <flux:select variant="listbox" searchable placeholder="انتخاب استان" wire:model.live="province_id" required>
+                @foreach ($this->provinces as $province)
+                    <flux:select.option value="{{ $province->id }}">
+                        {{ $province->name_fa }}
+                    </flux:select.option>
+                @endforeach
+            </flux:select>
+
+            <div class="relative">
+                <flux:select variant="listbox" searchable placeholder="انتخاب شهر" wire:model.live="city_id" :disabled="!$province_id" required>
+                    @forelse ($this->cities as $city)
+                        <flux:select.option value="{{ $city->id }}">
+                            {{ $city->name_fa }}
+                        </flux:select.option>
+                    @empty
+                        <flux:select.option disabled>{{__('ابتدا استان را انتخاب کنید.')}}</flux:select.option>
+                    @endforelse
+                </flux:select>
+
+                <div wire:loading wire:target="province_id" class="absolute left-8 top-3">
+                    <flux:icon.loading variant="micro" class="text-amber-500 dark:text-amber-300"/>
+                </div>
+            </div>
+        </div>
+
+        <x-my.flt_lbl name="address" label="{{__('آدرس:')}}" maxlength="150" required/>
+        <x-my.flt_lbl name="postal_code" label="{{__('کدپستی:')}}" dir="ltr" maxlength="10"
                       class="tracking-wider font-semibold" required/>
+        <x-my.flt_lbl name="phone" label="{{__('تلفن:')}}" dir="ltr" maxlength="11" class="tracking-wider font-semibold"
+                      required/>
+        <x-my.flt_lbl name="mobile" label="{{__('موبایل:')}}" dir="ltr" maxlength="11"
+                      class="tracking-wider font-semibold" required/>
+
 
         <div class="flex">
             <flux:spacer/>
-            <flux:button type="submit" variant="primary" color="teal"
-                         class="cursor-pointer">{{__('ثبت')}}</flux:button>
+            <flux:button type="submit" variant="primary" color="teal" class="cursor-pointer">{{__('ثبت')}}</flux:button>
         </div>
     </form>
+
+    <div x-data="{ waiting: false }"
+         x-on:branch-created.window="waiting = true; setTimeout(() => { window.location.href = '{{ route('branch.index') }}'}, 1000);">
+        <!-- Overlay -->
+        <div x-show="waiting" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
+            <flux:callout icon="loading" color="emerald" class="w-[350px]" inline>
+                <flux:callout.heading>{{__('با موفقیت انجام شد.')}}</flux:callout.heading>
+                <flux:callout.text>{{__('در حال انتقال به لیست شعبه ها ....')}}</flux:callout.text>
+            </flux:callout>
+        </div>
+    </div>
 </div>
