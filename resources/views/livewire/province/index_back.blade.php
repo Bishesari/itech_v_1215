@@ -50,11 +50,13 @@ new class extends Component {
             variant: 'warning'
         );
     }
+
     #[On('province-created')]
     public function refreshList(): void
     {
         $this->resetPage();
     }
+
     #[On('province-updated')]
     #[On('province-deleted')]
     public function provinceChanged(): void
@@ -62,6 +64,7 @@ new class extends Component {
         $this->dispatch('$refresh');
     }
 }; ?>
+
 
 <div>
     <flux:heading size="lg" level="1">

@@ -1,20 +1,10 @@
 <?php
-
 use App\Models\Province;
 use Flux\Flux;
 use Livewire\Volt\Component;
 
 new class extends Component {
-
     public Province $province;
-
-    public string $name_fa = '';
-
-
-    public function mount(): void
-    {
-        $this->name_fa = $this->province->name_fa;
-    }
 
     public function delete_province(): void
     {

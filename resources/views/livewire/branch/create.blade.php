@@ -176,7 +176,7 @@ new class extends Component {
     <div x-data="{ waiting: false }"
          x-on:branch-created.window="waiting = true; setTimeout(() => { window.location.href = '{{ route('branch.index') }}'}, 1000);">
         <!-- Overlay -->
-        <div x-show="waiting" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
+        <div x-show="waiting" x-transition.opacity.duration.300ms x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
             <flux:callout icon="loading" color="emerald" class="w-[350px]" inline>
                 <flux:callout.heading>{{__('با موفقیت انجام شد.')}}</flux:callout.heading>
                 <flux:callout.text>{{__('در حال انتقال به لیست شعبه ها ....')}}</flux:callout.text>
