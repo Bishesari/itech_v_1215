@@ -14,6 +14,8 @@ new class extends Component {
     public string $sortBy = 'name_fa';
     public string $sortDirection = 'asc';
 
+    public ?int $deletingProvinceId = null;
+
     public ?int $highlightProvinceId = null;
 
     public function sort($column): void
@@ -33,6 +35,36 @@ new class extends Component {
             ->tap(fn($query) => $this->sortBy ? $query->orderBy($this->sortBy, $this->sortDirection) : $query)
             ->withCount('cities')
             ->paginate(10);
+    }
+
+    #[Computed]
+    public function provinceToDelete()
+    {
+        return $this->deletingProvinceId ? Province::find($this->deletingProvinceId) : null;
+    }
+
+    public function confirmDelete($id): void
+    {
+        $this->deletingProvinceId = $id;
+        $this->modal('delete-province-modal')->show();
+    }
+    public function deleteProvince(): void
+    {
+        $province = $this->provinceToDelete();
+
+        $province->delete();
+        $this->modal('delete-province-modal')->close();
+        // ریست کردن متغیر
+        $this->deletingProvinceId = null;
+
+        $this->dispatch('province-deleted');
+
+        Flux::toast(
+            heading: 'حذف شد.',
+            text: 'استان با موفقیت حذف شد.',
+            variant: 'danger',
+            position: 'top right'
+        );
     }
 
     public function toggleStatus(int $provinceId): void
@@ -171,12 +203,37 @@ new class extends Component {
                             </flux:link>
 
                             <livewire:province.edit :province="$province" :key="'province-edit-'.$province->id"/>
-                            <livewire:province.delete :province="$province" :key="'province-delete-'.$province->id"/>
+
+                            <flux:tooltip content="حذف استان" position="bottom">
+                                <flux:icon.trash
+                                    variant="micro"
+                                    class="cursor-pointer size-5 text-red-500 dark:text-red-400"
+                                    wire:click="confirmDelete({{ $province->id }})"
+                                />
+                            </flux:tooltip>
+
                         </div>
                     </flux:table.cell>
                 </flux:table.row>
             @endforeach
         </flux:table.rows>
     </flux:table>
+
+
+    <flux:modal name="delete-province-modal" class="md:w-96">
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">{{__('حذف استان ')}} <span
+                        class="font-bold text-red-500 dark:text-red-400">{{$this->provinceToDelete?->name_fa }}</span></flux:heading>
+                <flux:text class="mt-2">{{__('با تایید اطلاعات مربوطه حذف خواهند شد.')}}</flux:text>
+            </div>
+
+            <flux:button wire:click="deleteProvince" variant="primary" color="red" size="sm"
+                         class="cursor-pointer">
+                {{__('تایید حذف')}}
+            </flux:button>
+        </div>
+    </flux:modal>
+
 
 </div>

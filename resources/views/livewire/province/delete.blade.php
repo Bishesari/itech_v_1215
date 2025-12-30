@@ -6,7 +6,7 @@ use Livewire\Volt\Component;
 new class extends Component {
     public Province $province;
 
-       public function delete_province(): void
+    public function delete_province(): void
     {
         $this->province->delete();
         $this->modal('delete-province-' . $this->province->id)->close();
