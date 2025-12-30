@@ -10,7 +10,9 @@ new class extends Component {
 
     public $province_id;
     public Province $province;
+
     public bool $show_btn = true;
+
 
     public string $name_fa = '';
     public string $name_en = '';
@@ -31,9 +33,10 @@ new class extends Component {
     {
         $validated = $this->validate();
         $validated['province_id'] = $this->province->id;
-        City::create($validated);
+
+        $city=City::create($validated);
         $this->modal('new-city')->close();
-        $this->dispatch('city-created');
+        $this->dispatch('city-created', id: $city->id);
 
         Flux::toast(
             heading: 'ثبت شد.',
@@ -60,6 +63,7 @@ new class extends Component {
                                    x-on:click="$flux.modal('new-city').show()"/>
         </flux:tooltip>
     @endif
+
     <flux:modal name="new-city" :show="$errors->isNotEmpty()" focusable class="md:w-96" @close="reset_prop"
                 :dismissible="false">
         <div class="space-y-6">

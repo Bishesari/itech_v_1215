@@ -31,7 +31,7 @@ new class extends Component {
     public function roles()
     {
         return Role::query()
-            ->tap(fn($query) => $this->sortBy ? $query->orderBy($this->sortBy, $this->sortDirection) : $query)
+            ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->perPage);
     }
 

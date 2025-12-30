@@ -8,16 +8,11 @@ use Livewire\Volt\Component;
 use Livewire\WithPagination;
 
 new class extends Component {
-
     use WithPagination;
-
     public string $sortBy = 'name_fa';
     public string $sortDirection = 'asc';
-
     public ?int $deletingProvinceId = null;
-
     public ?int $highlightProvinceId = null;
-
     public int $perPage = 10;
 
     public function sort($column): void
@@ -34,7 +29,7 @@ new class extends Component {
     public function provinces()
     {
         return Province::query()
-            ->tap(fn($query) => $this->sortBy ? $query->orderBy($this->sortBy, $this->sortDirection) : $query)
+            ->orderBy($this->sortBy, $this->sortDirection)
             ->withCount('cities')
             ->paginate($this->perPage);
     }

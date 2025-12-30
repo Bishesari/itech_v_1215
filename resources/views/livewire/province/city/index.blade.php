@@ -2,6 +2,7 @@
 
 use App\Models\City;
 use App\Models\Province;
+use App\Models\Role;
 use Flux\Flux;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
@@ -10,11 +11,13 @@ use Livewire\WithPagination;
 
 new class extends Component {
     public Province $province;
-
     use WithPagination;
 
     public string $sortBy = 'name_fa';
     public string $sortDirection = 'asc';
+
+    public ?int $highlightCityId = null;
+    public int $perPage = 10;
 
     public function sort(string $column): void
     {
@@ -24,7 +27,6 @@ new class extends Component {
             $this->sortBy = $column;
             $this->sortDirection = 'asc';
         }
-        $this->resetPage();
     }
 
     #[Computed]
@@ -32,8 +34,8 @@ new class extends Component {
     {
         return City::query()
             ->where('province_id', $this->province->id)
-            ->orderBy($this->sortBy ?? 'name_fa', $this->sortDirection ?? 'asc')
-            ->paginate(12);
+            ->orderBy($this->sortBy, $this->sortDirection)
+            ->paginate($this->perPage);
     }
 
     public function toggleStatus(int $cityId): void
@@ -57,25 +59,42 @@ new class extends Component {
     #[On('city-created')]
     public function cityCreated($id = null): void
     {
+        $this->reset('sortBy');
+        $this->reset('sortDirection');
+
+        $city = City::find($id);
+        if (!$city) {
+            return;
+        }
+        $beforeCount = City::where('name_fa', '<', $city->name_fa)->count();
+        $page = intdiv($beforeCount, $this->perPage) + 1;
+        $this->gotoPage($page);
         $this->highlightCityId = $id;
-        $this->resetPage();
-        // پاک‌سازی خودکار
         $this->dispatch('remove-highlight')->self();
     }
 
-    #[On('city-created')]
-    public function refreshList(): void
-    {
-        $this->resetPage();
-    }
-
     #[On('city-updated')]
-    #[On('city-deleted')]
-    public function cityChanged(): void
+    public function cityUpdated($id = null): void
     {
-        $this->dispatch('$refresh');
+        $this->highlightCityId = $id;
+        $this->dispatch('remove-highlight')->self();
     }
 
+    #[On('city-deleted')]
+    public function afterDelete(): void
+    {
+        $cities = $this->cities();
+        if ($cities->isEmpty() && $cities->currentPage() > 1) {
+            $this->previousPage();
+        }
+    }
+
+    #[On('remove-highlight')]
+    public function removeHighlight(): void
+    {
+        sleep(2);
+        $this->highlightCityId = null;
+    }
 
 }; ?>
 
@@ -86,7 +105,8 @@ new class extends Component {
 
     <div class="inline-flex mt-2 mb-4">
         <flux:breadcrumbs>
-            <flux:breadcrumbs.item href="{{route('province.index')}}" wire:navigate x-data="{ loading: false }" @click="loading = true">
+            <flux:breadcrumbs.item href="{{route('province.index')}}" wire:navigate x-data="{ loading: false }"
+                                   @click="loading = true">
                 <span x-show="!loading" x-cloak class="text-blue-500">{{__('استان')}}</span>
                 <flux:icon.loading x-show="loading" x-cloak class="size-5 animate-spin text-blue-500 mr-3"/>
             </flux:breadcrumbs.item>
@@ -124,7 +144,7 @@ new class extends Component {
         <flux:table.rows>
 
             @foreach ($this->cities as $city)
-                <flux:table.row>
+                <flux:table.row class="transition duration-500 {{ $highlightCityId === $city->id ? 'bg-green-100 dark:bg-green-900/40' : '' }}">
                     <flux:table.cell>{{ $city->id }}</flux:table.cell>
                     <flux:table.cell>{{ $city->name_fa }}</flux:table.cell>
                     <flux:table.cell>{{ $city->name_en }}</flux:table.cell>
