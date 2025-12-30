@@ -6,7 +6,7 @@ use Livewire\Volt\Component;
 new class extends Component {
     public Province $province;
 
-    public function delete_province(): void
+       public function delete_province(): void
     {
         $this->province->delete();
         $this->modal('delete-province-' . $this->province->id)->close();
@@ -14,8 +14,9 @@ new class extends Component {
 
         Flux::toast(
             heading: 'حذف شد.',
-            text: 'استان با موفقیت حذف شد.',
-            variant: 'danger'
+            text: 'نقش کاربری با موفقیت حذف شد.',
+            variant: 'danger',
+            position: 'top right'
         );
     }
 
@@ -32,16 +33,13 @@ new class extends Component {
             <div>
                 <flux:heading size="lg">{{__('حذف استان ')}} <span
                         class="font-bold text-red-500 dark:text-red-400">{{ $province->name_fa }}</span></flux:heading>
-                <flux:text class="mt-2">{{__('با تایید حذف اطلاعات مربوطه حذف خواهند شد.')}}</flux:text>
+                <flux:text class="mt-2">{{__('با تایید اطلاعات مربوطه حذف خواهند شد.')}}</flux:text>
             </div>
 
-            <form wire:submit.prevent="delete_province" class="space-y-4 flex flex-col gap-3" autocomplete="off">
-                <div class="flex">
-                    <flux:spacer/>
-                    <flux:button type="submit" variant="primary" color="red" size="sm"
-                                 class="cursor-pointer">{{__('تایید حذف')}}</flux:button>
-                </div>
-            </form>
+            <flux:button wire:click="delete_province" variant="primary" color="red" size="sm"
+                         class="cursor-pointer">
+                {{__('تایید حذف')}}
+            </flux:button>
         </div>
     </flux:modal>
 </div>

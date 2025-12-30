@@ -14,7 +14,9 @@ new class extends Component {
     public string $sortBy = 'name_fa';
     public string $sortDirection = 'asc';
 
-    public function sort(string $column): void
+    public ?int $highlightProvinceId = null;
+
+    public function sort($column): void
     {
         if ($this->sortBy === $column) {
             $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
@@ -22,16 +24,15 @@ new class extends Component {
             $this->sortBy = $column;
             $this->sortDirection = 'asc';
         }
-        $this->resetPage();
     }
 
     #[Computed]
     public function provinces()
     {
         return Province::query()
-            ->withCount('cities') // حتی اگر صفر باشد، استان حذف نمی‌شود
-            ->orderBy($this->sortBy, $this->sortDirection)
-            ->paginate(12);
+            ->tap(fn($query) => $this->sortBy ? $query->orderBy($this->sortBy, $this->sortDirection) : $query)
+            ->withCount('cities')
+            ->paginate(10);
     }
 
     public function toggleStatus(int $provinceId): void
@@ -47,20 +48,37 @@ new class extends Component {
         Flux::toast(
             heading: 'به‌روزرسانی شد',
             text: 'وضعیت استان با موفقیت تغییر کرد.',
-            variant: 'warning'
+            variant: 'warning',
+            position: 'top right'
         );
     }
+
     #[On('province-created')]
-    public function refreshList(): void
+    public function provinceCreated($id = null): void
     {
+        $this->highlightProvinceId = $id;
         $this->resetPage();
+        // پاک‌سازی خودکار
+        $this->dispatch('remove-highlight')->self();
     }
+
     #[On('province-updated')]
-    #[On('province-deleted')]
-    public function provinceChanged(): void
+    public function provinceUpdated($id = null): void
     {
+        $this->highlightProvinceId = $id;
         $this->dispatch('$refresh');
+        $this->dispatch('remove-highlight')->self();
     }
+
+    #[On('province-deleted')]
+    public function afterDelete(): void
+    {
+        $province = $this->provinces();
+        if ($province->isEmpty() && $province->currentPage() > 1) {
+            $this->previousPage();
+        }
+    }
+
 }; ?>
 
 <div>

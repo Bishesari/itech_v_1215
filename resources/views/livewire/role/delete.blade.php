@@ -8,16 +8,6 @@ new class extends Component {
 
     public Role $role;
 
-    public string $name_fa = '';
-    public string $name_en = '';
-
-
-    public function mount(): void
-    {
-        $this->name_fa = $this->role->name_fa;
-        $this->name_en = $this->role->name_en;
-    }
-
     public function delete_role(): void
     {
         $this->role->delete();
@@ -27,7 +17,8 @@ new class extends Component {
         Flux::toast(
             heading: 'حذف شد.',
             text: 'نقش کاربری با موفقیت حذف شد.',
-            variant: 'danger'
+            variant: 'danger',
+            position: 'top right'
         );
     }
 
@@ -44,16 +35,13 @@ new class extends Component {
             <div>
                 <flux:heading size="lg">{{__('حذف نقش کاربری ')}} <span
                         class="font-bold text-red-500 dark:text-red-400">{{ $role->name_fa }}</span></flux:heading>
-                <flux:text class="mt-2">{{__('با تایید حذف اطلاعات مربوطه حذف خواهند شد.')}}</flux:text>
+                <flux:text class="mt-2">{{__('با تایید اطلاعات مربوطه حذف خواهند شد.')}}</flux:text>
             </div>
 
-            <form wire:submit.prevent="delete_role" class="space-y-4 flex flex-col gap-3" autocomplete="off">
-                <div class="flex">
-                    <flux:spacer/>
-                    <flux:button type="submit" variant="primary" color="red" size="sm"
-                                 class="cursor-pointer">{{__('تایید حذف')}}</flux:button>
-                </div>
-            </form>
+            <flux:button wire:click="delete_role" variant="primary" color="red" size="sm"
+                         class="cursor-pointer">
+                {{__('تایید حذف')}}
+            </flux:button>
         </div>
     </flux:modal>
 </div>

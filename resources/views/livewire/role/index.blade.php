@@ -13,7 +13,9 @@ new class extends Component {
     public string $sortBy = 'id';
     public string $sortDirection = 'desc';
 
-    public function sort(string $column): void
+    public ?int $highlightRoleId = null;
+
+    public function sort($column): void
     {
         if ($this->sortBy === $column) {
             $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
@@ -21,28 +23,47 @@ new class extends Component {
             $this->sortBy = $column;
             $this->sortDirection = 'asc';
         }
-        $this->resetPage();
     }
 
     #[Computed]
     public function roles()
     {
         return Role::query()
-            ->orderBy($this->sortBy, $this->sortDirection)
-            ->paginate(12);
+            ->tap(fn($query) => $this->sortBy ? $query->orderBy($this->sortBy, $this->sortDirection) : $query)
+            ->paginate(10);
     }
 
     #[On('role-created')]
-    public function refreshList(): void
+    public function roleCreated($id = null): void
     {
+        $this->highlightRoleId = $id;
         $this->resetPage();
+
+        // پاک‌سازی خودکار
+        $this->dispatch('remove-highlight')->self();
+    }
+    #[On('role-updated')]
+    public function roleUpdated($id = null): void
+    {
+        $this->highlightRoleId = $id;
+        $this->dispatch('$refresh');
+        $this->dispatch('remove-highlight')->self();
     }
 
-    #[On('role-updated')]
     #[On('role-deleted')]
-    public function roleChanged(): void
+    public function afterDelete(): void
     {
-        $this->dispatch('$refresh');
+        $roles = $this->roles();
+        if ($roles->isEmpty() && $roles->currentPage() > 1) {
+            $this->previousPage();
+        }
+    }
+
+    #[On('remove-highlight')]
+    public function removeHighlight(): void
+    {
+        sleep(2);
+        $this->highlightRoleId = null;
     }
 
 }; ?>
@@ -55,12 +76,14 @@ new class extends Component {
 
     <div class="inline-flex mt-2 mb-4">
         <flux:text>{{__('نقشهای کاربری')}}</flux:text>
+
+        {{-- Create Component --}}
         <livewire:role.create/>
     </div>
-
     <flux:separator variant="subtle"/>
 
     <flux:table :paginate="$this->roles" class="inline">
+
         <flux:table.columns>
             <flux:table.column sortable :sorted="$sortBy === 'id'" :direction="$sortDirection"
                                wire:click="sort('id')">
@@ -85,10 +108,13 @@ new class extends Component {
 
             <flux:table.column>{{ __('عملیات') }}</flux:table.column>
         </flux:table.columns>
-        <flux:table.rows>
 
+
+
+        <flux:table.rows>
             @foreach ($this->roles as $role)
-                <flux:table.row>
+
+                <flux:table.row class="transition duration-500 {{ $highlightRoleId === $role->id ? 'bg-green-100 dark:bg-green-900/40' : '' }}">
                     <flux:table.cell>{{ $role->id }}</flux:table.cell>
                     <flux:table.cell>{{ $role->name_fa }}</flux:table.cell>
                     <flux:table.cell>{{ $role->name_en }}</flux:table.cell>
@@ -108,12 +134,13 @@ new class extends Component {
 
                     <flux:table.cell>
                         <div class="inline-flex items-center gap-2">
-                            <livewire:role.edit :$role :key="'role-edit-'.$role->id"/>
-                            <livewire:role.delete :$role :key="'role-delete-'.$role->id"/>
+                            <livewire:role.edit :role="$role" :key="'role-edit-'.$role->id"/>
+                            <livewire:role.delete :role="$role" :key="'role-delete-'.$role->id"/>
                         </div>
                     </flux:table.cell>
                 </flux:table.row>
             @endforeach
+
         </flux:table.rows>
     </flux:table>
 

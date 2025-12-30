@@ -31,12 +31,14 @@ new class extends Component {
     {
         $this->role->update($this->validate());
         $this->modal('edit-role-' . $this->role->id)->close();
-        $this->dispatch('role-updated');
+
+        $this->dispatch('role-updated', id: $this->role->id);
 
         Flux::toast(
             heading: 'تغییرات اعمال شد.',
             text: 'نقش ' . $this->name_fa . ' با موفقیت ویرایش شد.',
-            variant: 'warning'
+            variant: 'warning',
+            position: 'top right'
         );
     }
 

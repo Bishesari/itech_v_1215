@@ -21,14 +21,15 @@ new class extends Component {
 
     public function save(): void
     {
-        Role::create($this->validate());
+        $role = Role::create($this->validate());
         $this->modal('new-role')->close();
-        $this->dispatch('role-created');
+        $this->dispatch('role-created', id: $role->id);
 
         Flux::toast(
             heading: 'ثبت شد.',
             text: 'نقش جدید با موفقیت ثبت شد.',
-            variant: 'success'
+            variant: 'success',
+            position: 'top right'
         );
     }
 
