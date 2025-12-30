@@ -14,6 +14,8 @@ new class extends Component {
     public string $sortBy = 'name_fa';
     public string $sortDirection = 'asc';
 
+    public ?int $deletingProvinceId = null;
+
     public ?int $highlightProvinceId = null;
 
     public function sort($column): void
@@ -33,6 +35,36 @@ new class extends Component {
             ->tap(fn($query) => $this->sortBy ? $query->orderBy($this->sortBy, $this->sortDirection) : $query)
             ->withCount('cities')
             ->paginate(10);
+    }
+
+    #[Computed]
+    public function provinceToDelete()
+    {
+        return $this->deletingProvinceId ? Province::find($this->deletingProvinceId) : null;
+    }
+
+    public function confirmDelete($id): void
+    {
+        $this->deletingProvinceId = $id;
+        $this->modal('confirm')->show();
+    }
+    public function deleteProvince(): void
+    {
+        $province = $this->provinceToDelete();
+
+        $province->delete();
+        $this->modal('confirm')->close();
+        // ریست کردن متغیر
+        $this->deletingProvinceId = null;
+
+        $this->dispatch('province-deleted');
+
+        Flux::toast(
+            heading: 'حذف شد.',
+            text: 'استان با موفقیت حذف شد.',
+            variant: 'danger',
+            position: 'top right'
+        );
     }
 
     public function toggleStatus(int $provinceId): void
@@ -123,7 +155,7 @@ new class extends Component {
         <flux:table.rows>
 
             @foreach ($this->provinces as $province)
-                <flux:table.row>
+                <flux:table.row wire:key="province-row-{{ $province->id }}" class="transition duration-500 {{ $highlightProvinceId === $province->id ? 'bg-green-100 dark:bg-green-900/40' : '' }}">
                     <flux:table.cell>{{ $province->id }}</flux:table.cell>
                     <flux:table.cell>{{ $province->name_fa }}</flux:table.cell>
                     <flux:table.cell>{{ $province->name_en }}</flux:table.cell>
@@ -171,12 +203,57 @@ new class extends Component {
                             </flux:link>
 
                             <livewire:province.edit :province="$province" :key="'province-edit-'.$province->id"/>
-                            <livewire:province.delete :province="$province" :key="'province-delete-'.$province->id"/>
+
+                            <flux:tooltip content="حذف استان" position="bottom">
+                                <div class="inline-block">
+                                    {{-- حالت عادی: نمایش آیکون سطل آشغال --}}
+                                    {{-- وقتی روی confirmDelete با این ID خاص کلیک شد، این مخفی شود --}}
+                                    <div wire:loading.remove wire:target="confirmDelete({{ $province->id }})">
+                                        <flux:icon.trash
+                                            variant="micro"
+                                            class="cursor-pointer size-5 text-red-500 dark:text-red-400"
+                                            wire:click="confirmDelete({{ $province->id }})"
+                                        />
+                                    </div>
+
+                                    {{-- حالت لودینگ: نمایش آیکون چرخنده --}}
+                                    {{-- فقط وقتی نمایش داده شود که confirmDelete با این ID خاص صدا زده شده --}}
+                                    <div wire:loading wire:target="confirmDelete({{ $province->id }})">
+                                        <flux:icon.loading class="size-5 text-red-500 dark:text-red-400" />
+                                    </div>
+                                </div>
+                            </flux:tooltip>
+
                         </div>
                     </flux:table.cell>
                 </flux:table.row>
             @endforeach
         </flux:table.rows>
     </flux:table>
+
+
+    <flux:modal name="confirm" class="md:w-96">
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">{{__('حذف استان ')}} <span
+                        class="font-bold text-red-500 dark:text-red-400">{{$this->provinceToDelete?->name_fa }}</span></flux:heading>
+                <flux:text class="mt-2">{{__('با تایید اطلاعات مربوطه حذف خواهند شد.')}}</flux:text>
+            </div>
+
+            <div class="flex gap-2">
+                {{-- دکمه تایید با لودینگ --}}
+                <flux:button wire:click="deleteProvince" variant="primary" color="red" size="sm" class="flex-1">
+                    <span wire:loading.remove wire:target="deleteProvince">{{__('تایید حذف')}}</span>
+                    <span wire:loading wire:target="deleteProvince">{{__('در حال حذف...')}}</span>
+                </flux:button>
+
+                {{-- دکمه انصراف --}}
+                <flux:button x-on:click="$flux.modal('confirm').close()" variant="ghost" size="sm" class="flex-1">
+                    {{__('انصراف')}}
+                </flux:button>
+            </div>
+        </div>
+    </flux:modal>
+
 
 </div>

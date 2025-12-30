@@ -30,7 +30,7 @@ new class extends Component {
                          x-on:click="$flux.modal('delete-role-{{ $role->id }}').show()"/>
     </flux:tooltip>
 
-    <flux:modal name="delete-role-{{ $role->id }}" :show="$errors->isNotEmpty()" focusable class="md:w-96">
+    <flux:modal name="delete-role-{{ $role->id }}" class="md:w-96">
         <div class="space-y-6">
             <div>
                 <flux:heading size="lg">{{__('حذف نقش کاربری ')}} <span
