@@ -38,7 +38,8 @@ new class extends Component {
         Flux::toast(
             heading: 'ثبت شد.',
             text: 'شهر جدید با موفقیت ثبت شد.',
-            variant: 'success'
+            variant: 'success',
+            position: 'top right'
         );
     }
 

@@ -31,12 +31,13 @@ new class extends Component {
     {
         $this->city->update($this->validate());
         $this->modal('edit-city-' . $this->city->id)->close();
-        $this->dispatch('city-updated');
+        $this->dispatch('city-updated', id: $this->city->id);
 
         Flux::toast(
             heading: 'تغییرات اعمال شد.',
             text: 'استان ' . $this->name_fa . ' با موفقیت ویرایش شد.',
-            variant: 'warning'
+            variant: 'warning',
+            position: 'top right'
         );
     }
 

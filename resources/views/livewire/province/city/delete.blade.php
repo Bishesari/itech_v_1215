@@ -25,7 +25,8 @@ new class extends Component {
         Flux::toast(
             heading: 'حذف شد.',
             text: 'شهر با موفقیت حذف شد.',
-            variant: 'danger'
+            variant: 'danger',
+            position: 'top right'
         );
     }
 

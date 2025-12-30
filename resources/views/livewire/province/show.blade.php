@@ -49,8 +49,18 @@ new class extends Component {
         Flux::toast(
             heading: 'به‌روزرسانی شد',
             text: 'وضعیت شهر با موفقیت تغییر کرد.',
-            variant: 'warning'
+            variant: 'warning',
+            position: 'top right'
         );
+    }
+
+    #[On('city-created')]
+    public function cityCreated($id = null): void
+    {
+        $this->highlightCityId = $id;
+        $this->resetPage();
+        // پاک‌سازی خودکار
+        $this->dispatch('remove-highlight')->self();
     }
 
     #[On('city-created')]

@@ -23,14 +23,15 @@ new class extends Component {
 
     public function save(): void
     {
-        Province::create($this->validate());
+        $province = Province::create($this->validate());
         $this->modal('new-province')->close();
-        $this->dispatch('province-created');
+        $this->dispatch('province-created', id: $province->id);
 
         Flux::toast(
             heading: 'ثبت شد.',
             text: 'استان جدید با موفقیت ثبت شد.',
-            variant: 'success'
+            variant: 'success',
+            position: 'top right'
         );
     }
 

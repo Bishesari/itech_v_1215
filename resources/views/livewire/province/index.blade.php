@@ -105,10 +105,17 @@ new class extends Component {
     #[On('province-deleted')]
     public function afterDelete(): void
     {
-        $province = $this->provinces();
-        if ($province->isEmpty() && $province->currentPage() > 1) {
+        $provinces = $this->provinces();
+        if ($provinces->isEmpty() && $provinces->currentPage() > 1) {
             $this->previousPage();
         }
+    }
+
+    #[On('remove-highlight')]
+    public function removeHighlight(): void
+    {
+        sleep(2);
+        $this->highlightProvinceId = null;
     }
 
 }; ?>
@@ -165,7 +172,9 @@ new class extends Component {
                     </flux:table.cell>
 
                     <flux:table.cell>
+
                         <div class="inline-flex items-center gap-2">
+
                             <flux:badge size="sm" color="{{ $province->is_active ? 'green' : 'red' }}">
                                 {{ $province->is_active ? 'فعال' : 'غیرفعال' }}
                             </flux:badge>
@@ -215,7 +224,6 @@ new class extends Component {
                                             wire:click="confirmDelete({{ $province->id }})"
                                         />
                                     </div>
-
                                     {{-- حالت لودینگ: نمایش آیکون چرخنده --}}
                                     {{-- فقط وقتی نمایش داده شود که confirmDelete با این ID خاص صدا زده شده --}}
                                     <div wire:loading wire:target="confirmDelete({{ $province->id }})">
@@ -232,6 +240,8 @@ new class extends Component {
     </flux:table>
 
 
+
+    {{--    Confirm Delete Modal   --}}
     <flux:modal name="confirm" class="md:w-96">
         <div class="space-y-6">
             <div>
@@ -242,13 +252,12 @@ new class extends Component {
 
             <div class="flex gap-2">
                 {{-- دکمه تایید با لودینگ --}}
-                <flux:button wire:click="deleteProvince" variant="primary" color="red" size="sm" class="flex-1">
-                    <span wire:loading.remove wire:target="deleteProvince">{{__('تایید حذف')}}</span>
-                    <span wire:loading wire:target="deleteProvince">{{__('در حال حذف...')}}</span>
+                <flux:button wire:click="deleteProvince" variant="primary" color="red" size="sm" class="flex-1 cursor-pointer">
+                    <span wire:target="deleteProvince">{{__('تایید حذف')}}</span>
                 </flux:button>
 
                 {{-- دکمه انصراف --}}
-                <flux:button x-on:click="$flux.modal('confirm').close()" variant="ghost" size="sm" class="flex-1">
+                <flux:button x-on:click="$flux.modal('confirm').close()" variant="ghost" size="sm" class="flex-1 cursor-pointer">
                     {{__('انصراف')}}
                 </flux:button>
             </div>
