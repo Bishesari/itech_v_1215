@@ -15,6 +15,8 @@ new class extends Component {
 
     public ?int $highlightRoleId = null;
 
+    public int $perPage = 10;
+
     public function sort($column): void
     {
         if ($this->sortBy === $column) {
@@ -30,23 +32,27 @@ new class extends Component {
     {
         return Role::query()
             ->tap(fn($query) => $this->sortBy ? $query->orderBy($this->sortBy, $this->sortDirection) : $query)
-            ->paginate(10);
+            ->paginate($this->perPage);
     }
 
     #[On('role-created')]
     public function roleCreated($id = null): void
     {
-        $this->highlightRoleId = $id;
-        $this->resetPage();
+        $this->reset('sortBy');
+        $this->reset('sortDirection');
 
-        // پاک‌سازی خودکار
+        $role = Role::find($id);
+        if (! $role) {return;}
+        $beforeCount = Role::where('id', '>', $role->id)->count();
+        $page = intdiv($beforeCount, $this->perPage) + 1;
+        $this->gotoPage($page);
+        $this->highlightRoleId = $id;
         $this->dispatch('remove-highlight')->self();
     }
     #[On('role-updated')]
     public function roleUpdated($id = null): void
     {
         $this->highlightRoleId = $id;
-        $this->dispatch('$refresh');
         $this->dispatch('remove-highlight')->self();
     }
 

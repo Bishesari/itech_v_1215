@@ -18,6 +18,8 @@ new class extends Component {
 
     public ?int $highlightProvinceId = null;
 
+    public int $perPage = 10;
+
     public function sort($column): void
     {
         if ($this->sortBy === $column) {
@@ -34,7 +36,7 @@ new class extends Component {
         return Province::query()
             ->tap(fn($query) => $this->sortBy ? $query->orderBy($this->sortBy, $this->sortDirection) : $query)
             ->withCount('cities')
-            ->paginate(10);
+            ->paginate($this->perPage);
     }
 
     #[Computed]
@@ -88,9 +90,16 @@ new class extends Component {
     #[On('province-created')]
     public function provinceCreated($id = null): void
     {
+        $this->reset('sortBy');
+        $this->reset('sortDirection');
+        $province = Province::find($id);
+        if (! $province) {return;}
+
+        $beforeCount = Province::where('name_fa', '<', $province->name_fa)->count();
+        $page = intdiv($beforeCount, $this->perPage) + 1;
+        $this->gotoPage($page);
+
         $this->highlightProvinceId = $id;
-        $this->resetPage();
-        // پاک‌سازی خودکار
         $this->dispatch('remove-highlight')->self();
     }
 
@@ -98,7 +107,6 @@ new class extends Component {
     public function provinceUpdated($id = null): void
     {
         $this->highlightProvinceId = $id;
-        $this->dispatch('$refresh');
         $this->dispatch('remove-highlight')->self();
     }
 
@@ -206,7 +214,7 @@ new class extends Component {
 
                     <flux:table.cell>
                         <div class="inline-flex items-center gap-2">
-                            <flux:link href="{{ route('province.show', $province) }}" variant="subtle" wire:navigate x-data="{ loading: false }" @click="loading = true">
+                            <flux:link href="{{ route('city.index', $province) }}" variant="subtle" wire:navigate x-data="{ loading: false }" @click="loading = true">
                                 <span x-show="!loading" class="text-blue-500">{{ __('شهرها') }}</span>
                                 <flux:icon.loading x-show="loading" class="size-5 text-blue-500 mr-3"/>
                             </flux:link>
