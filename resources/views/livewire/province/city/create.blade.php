@@ -52,8 +52,6 @@ new class extends Component {
         $this->reset('name_en');
         $this->resetErrorBag();
     }
-
-
 }; ?>
 
 <div>

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Field;
+use Flux\Flux;
 use Illuminate\Validation\Rule;
 use Livewire\Volt\Component;
 
@@ -20,7 +21,14 @@ new class extends Component {
     {
         $field = Field::create($this->validate());
         $this->modal('new-field')->close();
-        $this->dispatch('field-created', c_id: $field->id);
+        $this->dispatch('field-created', id: $field->id);
+
+        Flux::toast(
+            heading: 'ثبت شد.',
+            text: 'رشته جدید با موفقیت ثبت شد.',
+            variant: 'success',
+            position: 'top right'
+        );
     }
 
     public function reset_prop(): void
