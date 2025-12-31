@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Branch;
+use Flux\Flux;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;
@@ -12,15 +13,7 @@ new class extends Component {
     public string $sortBy = 'id';
     public string $sortDirection = 'desc';
 
-    protected array $sortable = [
-        'code',
-        'short_name',
-        'full_name',
-        'credit_balance',
-        'is_active',
-        'province',
-        'city',
-    ];
+    protected array $sortable = ['code', 'abbr', 'short_name', 'province', 'city', 'credit_balance', 'created_at', 'updated_at'];
 
 
     public function sort(string $column): void
@@ -55,9 +48,27 @@ new class extends Component {
             ->paginate(12);
     }
 
+    public function toggleStatus(int $branchId): void
+    {
+        $branch = Branch::findOrFail($branchId);
+
+        $branch->update([
+            'is_active' => !$branch->is_active,
+        ]);
+
+        $this->dispatch('branch-updated');
+
+        Flux::toast(
+            heading: 'به‌روزرسانی شد',
+            text: 'وضعیت شعبه با موفقیت تغییر کرد.',
+            variant: 'warning',
+            position: 'top right'
+        );
+    }
+
 }; ?>
 
-<div xmlns:flux="http://www.w3.org/1999/html">
+<div>
     <flux:heading size="lg" level="1">
         {{__('اطلاعات پایه')}}
     </flux:heading>

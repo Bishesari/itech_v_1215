@@ -1,0 +1,59 @@
+<?php
+
+use App\Models\Field;
+use Illuminate\Validation\Rule;
+use Livewire\Volt\Component;
+
+new class extends Component {
+
+    public string $title = '';
+
+    protected function rules(): array
+    {
+        return [
+            'title' => ['required', 'min:2', Rule::unique('fields', 'title')],
+        ];
+    }
+
+
+    public function save(): void
+    {
+        $field = Field::create($this->validate());
+        $this->modal('new-field')->close();
+        $this->dispatch('field-created', c_id: $field->id);
+    }
+
+    public function reset_prop(): void
+    {
+        $this->reset();
+        $this->resetErrorBag();
+    }
+
+}; ?>
+
+<div>
+    <flux:tooltip content="رشته جدید" position="left">
+        <flux:icon.plus-circle variant="micro" class="cursor-pointer size-5 text-blue-500 mr-4"
+                               x-on:click="$flux.modal('new-field').show()"/>
+    </flux:tooltip>
+
+    <flux:modal name="new-field" :show="$errors->isNotEmpty()" focusable class="md:w-96" @close="reset_prop"
+                :dismissible="false">
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">{{__('درج رشته جدید')}}</flux:heading>
+                <flux:text class="mt-2">{{__('اطلاعات رشته آموزشی جدید را وارد کنید.')}}</flux:text>
+            </div>
+
+            <form wire:submit.prevent="save" class="space-y-4 flex flex-col gap-3" autocomplete="off">
+                <x-my.flt_lbl name="title" label="{{__('عنوان رشته:')}}" maxlength="50"
+                              class="tracking-wider font-semibold" autofocus required/>
+                <div class="flex">
+                    <flux:spacer/>
+                    <flux:button type="submit" variant="primary" color="teal" size="sm"
+                                 class="cursor-pointer">{{__('ثبت')}}</flux:button>
+                </div>
+            </form>
+        </div>
+    </flux:modal>
+</div>
