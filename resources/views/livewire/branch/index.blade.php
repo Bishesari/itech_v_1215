@@ -81,7 +81,7 @@ new class extends Component {
                 {{-- آیکن پلاس --}}
                 <flux:icon.plus-circle x-show="!loading" variant="micro" class="size-5 text-blue-500 mr-3"/>
                 {{-- لودر --}}
-                <flux:icon.loading x-show="loading" class="size-5 animate-spin text-blue-500 mr-3"/>
+                <flux:icon.loading x-show="loading" class="size-5 text-blue-500 mr-3"/>
             </flux:link>
         </flux:tooltip>
     </div>

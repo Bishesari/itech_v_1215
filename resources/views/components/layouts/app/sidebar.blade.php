@@ -1,134 +1,170 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark" dir="rtl">
-    <head>
-        @include('partials.head')
-    </head>
-    <body class="min-h-screen bg-white dark:bg-zinc-800">
-        <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
-            <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
+<head>
+    @include('partials.head')
+</head>
 
-            <a href="{{ route('dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
-                <x-app-logo />
-            </a>
+<body class="min-h-screen bg-white dark:bg-zinc-800">
 
-            <flux:navlist variant="outline">
-                <flux:navlist.group :heading="__('Platform')" class="grid">
-                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
-                </flux:navlist.group>
-            </flux:navlist>
+<flux:sidebar sticky stashable collapsible="mobile" class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
 
-            <flux:spacer />
+    <flux:sidebar.header>
+        <flux:sidebar.brand href="{{route('home')}}">
+            <x-slot name="logo" class="size-16">
+                <x-logo class="text-zinc-700 dark:text-zinc-300"/>
+            </x-slot>
+        </flux:sidebar.brand>
+        <flux:sidebar.collapse class="lg:hidden in-data-flux-sidebar-on-desktop:not-in-data-flux-sidebar-collapsed-desktop:-mr-2"/>
+    </flux:sidebar.header>
 
-            <flux:navlist variant="outline">
-                <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                {{ __('Repository') }}
-                </flux:navlist.item>
 
-                <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                {{ __('Documentation') }}
-                </flux:navlist.item>
-            </flux:navlist>
+    <flux:navlist.group :heading="__('نقش جاری: سوپر ادمین')" class="grid">
+        <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('داشبرد') }}</flux:navlist.item>
+    </flux:navlist.group>
 
-            <!-- Desktop User Menu -->
-            <flux:dropdown class="hidden lg:block" position="bottom" align="start">
-                <flux:profile
-                    :name="auth()->user()->name"
-                    :initials="auth()->user()->initials()"
-                    icon:trailing="chevrons-up-down"
-                    data-test="sidebar-menu-button"
-                />
+    <flux:navlist.group :heading="__('اطلاعات پایه')" class="grid" expandable :expanded="request()->routeIs(['role.index', 'province.index', 'branch.index', 'field.index', 'standard.index'])" >
 
-                <flux:menu class="w-[220px]">
-                    <flux:menu.radio.group>
-                        <div class="p-0 text-sm font-normal">
-                            <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
-                                <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
-                                    <span
-                                        class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white"
-                                    >
-                                        {{ auth()->user()->initials() }}
-                                    </span>
-                                </span>
+        <flux:navlist.item icon="user-group" :href="route('role.index')" :current="request()->routeIs('role.index')" wire:navigate x-data="{ loading: false }"
+                           @click="loading = true">
+            <span>{{ __('نقشهای کاربری') }}</span>
+            <flux:icon.loading x-show="loading" class="inline absolute left-2 size-3.5 text-stone-500"/>
+        </flux:navlist.item>
 
-                                <div class="grid flex-1 text-start text-sm leading-tight">
-                                    <span class="truncate font-semibold">{{ auth()->user()->name }}</span>
-                                    <span class="truncate text-xs">{{ auth()->user()->email }}</span>
-                                </div>
-                            </div>
+        <flux:navlist.item icon="user-group" :href="route('province.index')" :current="request()->routeIs('province.index')" wire:navigate x-data="{ loading: false }"
+                           @click="loading = true">
+            <span>{{ __('استانها') }}</span>
+            <flux:icon.loading x-show="loading" class="inline absolute left-2 size-3.5 text-stone-500"/>
+        </flux:navlist.item>
+
+
+        <flux:navlist.item icon="user-group" :href="route('branch.index')" :current="request()->routeIs('branch.index')" wire:navigate x-data="{ loading: false }"
+                           @click="loading = true">
+            <span>{{ __('لیست شعب') }}</span>
+            <flux:icon.loading x-show="loading" class="inline absolute left-2 size-3.5 text-stone-500"/>
+        </flux:navlist.item>
+
+        <flux:navlist.item icon="user-group" :href="route('field.index')" :current="request()->routeIs('field.index')" wire:navigate x-data="{ loading: false }"
+                           @click="loading = true">
+            <span>{{ __('رشته های آموزشی') }}</span>
+            <flux:icon.loading x-show="loading" class="inline absolute left-2 size-3.5 text-stone-500"/>
+        </flux:navlist.item>
+
+        <flux:navlist.item icon="user-group" :href="route('standard.index')" :current="request()->routeIs('standard.index')" wire:navigate x-data="{ loading: false }"
+                           @click="loading = true">
+            <span>{{ __('استانداردها') }}</span>
+            <flux:icon.loading x-show="loading" class="inline absolute left-2 size-3.5 text-stone-500"/>
+        </flux:navlist.item>
+
+    </flux:navlist.group>
+
+
+
+
+
+
+
+    <flux:spacer />
+
+
+
+
+
+    <!-- Desktop User Menu -->
+    <flux:dropdown class="hidden lg:block" position="bottom" align="start">
+        <flux:profile
+            :name="auth()->user()->full_fa_name()"
+            :initials="auth()->user()->initials()"
+            icon:trailing="chevrons-up-down"
+            data-test="sidebar-menu-button"
+        />
+
+        <flux:menu class="w-[220px]">
+            <flux:menu.radio.group>
+                <div class="p-0 text-sm font-normal">
+                    <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
+                        <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
+                            <span
+                                class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white"
+                            >
+                                {{ auth()->user()->initials() }}
+                            </span>
+                        </span>
+
+                        <div class="grid flex-1 text-start text-sm leading-tight">
+                            <span class="truncate font-semibold">{{ auth()->user()->full_fa_name() }}</span>
+                            <span class="truncate text-xs">{{ auth()->user()->user_name }}</span>
                         </div>
-                    </flux:menu.radio.group>
+                    </div>
+                </div>
+            </flux:menu.radio.group>
 
-                    <flux:menu.separator />
+            <flux:menu.separator />
 
-                    <flux:menu.radio.group>
-                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
-                    </flux:menu.radio.group>
+            <flux:menu.radio.group>
+                <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('تنظیمات') }}</flux:menu.item>
+            </flux:menu.radio.group>
 
-                    <flux:menu.separator />
+            <flux:menu.separator />
 
-                    <form method="POST" action="{{ route('logout') }}" class="w-full">
-                        @csrf
-                        <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full" data-test="logout-button">
-                            {{ __('Log Out') }}
-                        </flux:menu.item>
-                    </form>
-                </flux:menu>
-            </flux:dropdown>
-        </flux:sidebar>
+            <form method="POST" action="{{ route('logout') }}" class="w-full">
+                @csrf
+                <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full" data-test="logout-button">
+                    {{ __('خروج از سیستم') }}
+                </flux:menu.item>
+            </form>
+        </flux:menu>
+    </flux:dropdown>
+</flux:sidebar>
 
-        <!-- Mobile User Menu -->
-        <flux:header class="lg:hidden">
-            <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
+<!-- Mobile User Menu -->
+<flux:header class="lg:hidden">
+    <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
+    <flux:spacer />
+    <flux:dropdown position="top" align="end">
+        <flux:profile
+            :initials="auth()->user()->initials()"
+            icon-trailing="chevron-down"
+        />
+        <flux:menu>
+            <flux:menu.radio.group>
+                <div class="p-0 text-sm font-normal">
+                    <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
+                        <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
+                            <span
+                                class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white"
+                            >
+                                {{ auth()->user()->initials() }}
+                            </span>
+                        </span>
 
-            <flux:spacer />
-
-            <flux:dropdown position="top" align="end">
-                <flux:profile
-                    :initials="auth()->user()->initials()"
-                    icon-trailing="chevron-down"
-                />
-
-                <flux:menu>
-                    <flux:menu.radio.group>
-                        <div class="p-0 text-sm font-normal">
-                            <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
-                                <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
-                                    <span
-                                        class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white"
-                                    >
-                                        {{ auth()->user()->initials() }}
-                                    </span>
-                                </span>
-
-                                <div class="grid flex-1 text-start text-sm leading-tight">
-                                    <span class="truncate font-semibold">{{ auth()->user()->name }}</span>
-                                    <span class="truncate text-xs">{{ auth()->user()->email }}</span>
-                                </div>
-                            </div>
+                        <div class="grid flex-1 text-start text-sm leading-tight">
+                            <span class="truncate font-semibold">{{ auth()->user()->full_fa_name() }}</span>
+                            <span class="truncate text-xs">{{ auth()->user()->user_name }}</span>
                         </div>
-                    </flux:menu.radio.group>
+                    </div>
+                </div>
+            </flux:menu.radio.group>
+            <flux:menu.separator />
 
-                    <flux:menu.separator />
+            <flux:menu.radio.group>
+                <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('تنظیمات') }}</flux:menu.item>
+            </flux:menu.radio.group>
 
-                    <flux:menu.radio.group>
-                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
-                    </flux:menu.radio.group>
+            <flux:menu.separator />
 
-                    <flux:menu.separator />
+            <form method="POST" action="{{ route('logout') }}" class="w-full">
+                @csrf
+                <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full" data-test="logout-button">
+                    {{ __('خروج از سیستم') }}
+                </flux:menu.item>
+            </form>
+        </flux:menu>
+    </flux:dropdown>
+</flux:header>
 
-                    <form method="POST" action="{{ route('logout') }}" class="w-full">
-                        @csrf
-                        <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full" data-test="logout-button">
-                            {{ __('Log Out') }}
-                        </flux:menu.item>
-                    </form>
-                </flux:menu>
-            </flux:dropdown>
-        </flux:header>
+{{ $slot }}
 
-        {{ $slot }}
-
-        @fluxScripts
-        <flux:toast />
-    </body>
+@fluxScripts
+<flux:toast />
+</body>
 </html>
