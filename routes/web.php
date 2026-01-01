@@ -43,3 +43,4 @@ Volt::route('branch/create', 'branch.create')->name('branch.create')->middleware
 Volt::route('branch/{branch}/edit', 'branch.edit')->name('branch.edit')->middleware(['auth']);
 
 Volt::route('fields', 'field.index')->name('field.index')->middleware(['auth']);
+Volt::route('standards', 'standard.index')->name('standard.index')->middleware(['auth']);
