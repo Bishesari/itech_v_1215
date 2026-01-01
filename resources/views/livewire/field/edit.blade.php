@@ -31,10 +31,10 @@ new class extends Component {
     {
         $this->editing_field->update($this->validate());
         $this->modal('edit')->close();
-        $this->dispatch("field-updated");
+        $this->dispatch("field-updated", id: $this->editing_field->id);
         Flux::toast(
             heading: 'ویرایش شد.',
-            text: 'رشته با موفقیت ویرایش شد.',
+            text: 'رشته '. $this->editing_field->title .' با موفقیت ویرایش شد.',
             variant: 'warning',
             position: 'top right'
         );
@@ -56,7 +56,7 @@ new class extends Component {
         </div>
 
         <form wire:submit.prevent="update_field" class="space-y-4 flex flex-col gap-3" autocomplete="off">
-            <x-my.flt_lbl name="title" label="{{__('نام نقش فارسی:')}}" maxlength="40"
+            <x-my.flt_lbl name="title" label="{{__('عنوان رشته:')}}" maxlength="40"
                           class="tracking-wider font-semibold" autofocus required/>
 
             <div class="flex">

@@ -13,6 +13,9 @@ new class extends Component {
     public string $sortDirection = 'desc';
     public int $perPage = 10;
 
+    public ?int $highlightedFieldId = null;
+
+
     #[Computed]
     public function fields()
     {
@@ -32,6 +35,8 @@ new class extends Component {
         $beforeCount = Field::where('id', '>', $field->id)->count();
         $page = intdiv($beforeCount, $this->perPage) + 1;
         $this->gotoPage($page);
+
+        $this->highlightedFieldId = $field->id;
     }
 
 
@@ -39,9 +44,21 @@ new class extends Component {
     #[On('field-updated')]
     public function afterUpdated($id = null): void
     {
+        $this->highlightedFieldId = $id;
 
     }
 
+    #[On('field-deleted')]
+    public function afterDeleted($id = null): void
+    {
+
+    }
+
+    #[On('clear-highlight')]
+    public function clearHighlight(): void
+    {
+        $this->highlightedFieldId = null;
+    }
 
 }; ?>
 
@@ -56,7 +73,6 @@ new class extends Component {
         <livewire:field.create/>
     </div>
     <flux:separator variant="subtle"/>
-
     <flux:table :paginate="$this->fields" class="inline">
 
         <flux:table.columns>
@@ -86,8 +102,17 @@ new class extends Component {
 
 
         <flux:table.rows>
+
+            @if($highlightedFieldId)
+                <div x-data x-init="setTimeout(() => $wire.set('highlightedFieldId', null), 1000)"></div>
+            @endif
+
             @foreach ($this->fields as $field)
-                <flux:table.row>
+                @php($class='')
+                @if($highlightedFieldId === $field->id)
+                    @php($class='bg-green-100 dark:bg-green-900/40')
+                @endif
+                <flux:table.row class="{{$class}}" wire:key="field-{{ $field->id }}">
                     <flux:table.cell>{{ $field->id }}</flux:table.cell>
                     <flux:table.cell>{{ $field->title }}</flux:table.cell>
 
@@ -104,15 +129,29 @@ new class extends Component {
                     </flux:table.cell>
 
                     <flux:table.cell>
-
                         <div class="inline-flex items-center gap-2">
-                            <flux:tooltip content="ویرایش رشته" position="bottom" >
-                                <flux:icon.pencil-square variant="micro" class="cursor-pointer size-5 text-yellow-500"
-                                                         wire:click="$dispatchTo('field.edit', 'show-edit-modal', { field: {{ $field }} })"
-                                />
-                            </flux:tooltip>
+                            {{--  Edit Modal Button  --}}
+                            <div x-data="{ loading: false }" @click.prevent="if (loading) return; loading = true; setTimeout(() => loading = false, 400);">
+                                <flux:tooltip content="ویرایش رشته" position="bottom" >
+
+                                    <flux:icon.pencil-square x-show="!loading" variant="micro" class="cursor-pointer size-5 text-yellow-500"
+                                                             wire:click="$dispatchTo('field.edit', 'show-edit-modal', { field: {{ $field }} })"
+                                    />
+                                    <flux:icon.loading x-show="loading" class="size-4 text-yellow-500"/>
+                                </flux:tooltip>
+                            </div>
+
+                            <div x-data="{ loading: false }" @@click.prevent="if (loading) return; loading = true; setTimeout(() => loading = false, 500);">
+                                <flux:tooltip content="ویرایش رشته" position="bottom" >
+                                    <flux:icon.trash x-show="!loading" variant="micro" class="cursor-pointer size-5 text-red-500"
+                                                             wire:click="$dispatchTo('field.delete', 'show-delete-modal', { field: {{ $field }} })"
+                                    />
+                                    <flux:icon.loading x-show="loading" class="size-4 text-red-500"/>
+                                </flux:tooltip>
+                            </div>
 
                         </div>
+
 
                     </flux:table.cell>
 
@@ -124,4 +163,5 @@ new class extends Component {
 
 
     <livewire:field.edit/>
+    <livewire:field.delete/>
 </div>
