@@ -54,7 +54,7 @@ class extends Component {
     }
 
 }; ?>
-<div class="flex flex-col gap-6">
+<div class="flex flex-col gap-6 pb-4">
 
     <!-- Header -->
     <div class="text-center space-y-2">
@@ -97,15 +97,20 @@ class extends Component {
     <p class="text-red-500 text-sm text-center">{{ $message }}</p>
     @enderror
 
-    <!-- CTA Button -->
-    <flux:button
-        wire:click="dashboard"
-        :disabled="!$selectedRoleId"
-        variant="primary"
-        color="sky"
-        class="cursor-pointer w-full py-2 text-sm font-medium mt-4"
-    >
-        {{ __('ادامه با نقش انتخابی') }}
-    </flux:button>
+    @if($selectedRoleId)
+        <!-- CTA Button -->
+        <flux:button wire:loading.remove wire:target="setRole" wire:click="dashboard" variant="primary" color="indigo"
+                     class="cursor-pointer w-full py-2 text-sm font-medium relative" x-data="{ loading: false }" @click="loading = true">
+            <span x-show="!loading">{{ __('ادامه با نقش انتخابی') }}</span>
+            <flux:icon.loading x-show="loading" class="inline mr-2 size-5"/>
+        </flux:button>
+
+        <flux:button wire:loading wire:target="setRole"
+                     class="w-full py-2 text-sm text-center font-medium">
+            <flux:icon.loading class="inline-block"/>
+        </flux:button>
+
+
+    @endif
 
 </div>

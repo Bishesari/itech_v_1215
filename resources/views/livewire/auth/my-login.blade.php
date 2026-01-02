@@ -57,12 +57,12 @@ new class extends Component {
 
 ?>
 
-<div class="flex flex-col gap-6">
+<div class="flex flex-col">
     <x-auth-header :title="__('ورود به حساب کاربری')"
                    :description="__('نام کاربری (کدملی) و پسورد قبلا پیامک شده است.')"/>
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')"/>
-    <form wire:submit.prevent="login" class="space-y-4 flex flex-col gap-3" autocomplete="off">
+    <form wire:submit.prevent="login" class="space-y-4 flex flex-col mt-5" autocomplete="off">
         <x-my.flt_lbl name="user_name" label="{{__('نام کاربری:')}}" dir="ltr" maxlength="25"
                       class="tracking-wider font-semibold" autofocus required/>
 
@@ -89,7 +89,7 @@ new class extends Component {
     </form>
 
     @if($context === 'modal')
-        <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400">
+        <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400 mt-4">
             <span>{{ __('حساب کاربری ندارید؟') }}</span>
             <flux:modal.trigger name="register">
                 <flux:button variant="ghost" icon:trailing="arrow-up-left"
@@ -98,7 +98,7 @@ new class extends Component {
             </flux:modal.trigger>
         </div>
     @else
-        <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400">
+        <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400 mt-4">
             <span>{{ __('حساب کاربری ندارید؟') }}</span>
             <flux:button :href="route('register')" wire:navigate variant="ghost" icon:trailing="arrow-up-left" size="sm"
                          class="cursor-pointer">{{ __('ثبت نام کنید.') }}
