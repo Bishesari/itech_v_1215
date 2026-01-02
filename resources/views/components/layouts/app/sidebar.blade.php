@@ -3,7 +3,10 @@
 <head>
     @include('partials.head')
 </head>
-
+@php
+    use App\Models\Role;
+    $activeRole = Role::find(session('active_role_id'));
+@endphp
 <body class="min-h-screen bg-white dark:bg-zinc-800">
 
 <flux:sidebar sticky stashable collapsible="mobile" class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
@@ -18,56 +21,21 @@
     </flux:sidebar.header>
 
 
-    <flux:navlist.group :heading="__('نقش جاری: سوپر ادمین')" class="grid">
-        <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('داشبرد') }}</flux:navlist.item>
-    </flux:navlist.group>
 
-    <flux:navlist.group :heading="__('اطلاعات پایه')" class="grid" expandable :expanded="request()->routeIs(['role.index', 'province.index', 'branch.index', 'field.index', 'standard.index'])" >
-
-        <flux:navlist.item icon="user-group" :href="route('role.index')" :current="request()->routeIs('role.index')" wire:navigate x-data="{ loading: false }"
-                           @click="loading = true">
-            <span>{{ __('نقشهای کاربری') }}</span>
-            <flux:icon.loading x-show="loading" class="inline absolute left-2 size-3.5 text-stone-500"/>
-        </flux:navlist.item>
-
-        <flux:navlist.item icon="user-group" :href="route('province.index')" :current="request()->routeIs('province.index')" wire:navigate x-data="{ loading: false }"
-                           @click="loading = true">
-            <span>{{ __('استانها') }}</span>
-            <flux:icon.loading x-show="loading" class="inline absolute left-2 size-3.5 text-stone-500"/>
-        </flux:navlist.item>
-
-
-        <flux:navlist.item icon="user-group" :href="route('branch.index')" :current="request()->routeIs('branch.index')" wire:navigate x-data="{ loading: false }"
-                           @click="loading = true">
-            <span>{{ __('لیست شعب') }}</span>
-            <flux:icon.loading x-show="loading" class="inline absolute left-2 size-3.5 text-stone-500"/>
-        </flux:navlist.item>
-
-        <flux:navlist.item icon="user-group" :href="route('field.index')" :current="request()->routeIs('field.index')" wire:navigate x-data="{ loading: false }"
-                           @click="loading = true">
-            <span>{{ __('رشته های آموزشی') }}</span>
-            <flux:icon.loading x-show="loading" class="inline absolute left-2 size-3.5 text-stone-500"/>
-        </flux:navlist.item>
-
-        <flux:navlist.item icon="user-group" :href="route('standard.index')" :current="request()->routeIs('standard.index')" wire:navigate x-data="{ loading: false }"
-                           @click="loading = true">
-            <span>{{ __('استانداردها') }}</span>
-            <flux:icon.loading x-show="loading" class="inline absolute left-2 size-3.5 text-stone-500"/>
-        </flux:navlist.item>
-
-    </flux:navlist.group>
-
-
-
+    @if ($activeRole)
+        @includeIf('partials.sidebars.' . $activeRole->name_en)
+    @else
+        <flux:navlist.group :heading="__('بدون نقش')" class="grid">
+            <flux:navlist.item>
+                {{ __('هیچ نقشی انتخاب نشده است.') }}
+            </flux:navlist.item>
+        </flux:navlist.group>
+    @endif
 
 
 
 
     <flux:spacer />
-
-
-
-
 
     <!-- Desktop User Menu -->
     <flux:dropdown class="hidden lg:block" position="bottom" align="start">

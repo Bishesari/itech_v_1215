@@ -23,5 +23,10 @@ class BranchRoleUserSeeder extends Seeder
             'role_id' => 3,
             'assigned_by' => 1,
         ]);
+        BranchRoleUser::create([
+            'user_id' => 1,
+            'role_id' => 1,
+            'assigned_by' => 1,
+        ]);
     }
 }
