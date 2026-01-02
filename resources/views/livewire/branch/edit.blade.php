@@ -67,12 +67,6 @@ new class extends Component {
 
         $this->branch->update($validated);
 
-        Flux::toast(
-            heading: 'ویرایش شد',
-            text: 'اطلاعات شعبه با موفقیت بروزرسانی شد',
-            variant: 'success'
-        );
-
         $this->dispatch('branch-updated');
     }
 
@@ -111,7 +105,7 @@ new class extends Component {
 
     <div class="inline-flex mt-2 mb-4">
         <flux:breadcrumbs>
-            <flux:breadcrumbs.item href="{{route('branch.index')}}" wire:navigate x-data="{ loading: false }"
+            <flux:breadcrumbs.item href="{{route('branch.index', ['highlight_id'=> 0])}}" wire:navigate x-data="{ loading: false }"
                                    @click="loading = true">
                 <span x-show="!loading" class="text-blue-500">{{__('شعبه')}}</span>
                 <flux:icon.loading x-show="loading" class="size-5 animate-spin text-blue-500 mr-3"/>
@@ -178,9 +172,15 @@ new class extends Component {
                       class="tracking-wider font-semibold" required/>
 
 
-        <div class="flex">
-            <flux:spacer/>
-            <flux:button type="submit" variant="primary" color="teal" class="cursor-pointer">{{__('ثبت')}}</flux:button>
+        <div class="flex justify-between flex-row-reverse">
+            <flux:button type="submit" variant="primary" color="yellow"
+                         class="cursor-pointer">{{__('ثبت')}}</flux:button>
+
+            <flux:button href="{{route('branch.index', ['highlight_id' => '0'])}}" variant="primary" color="zinc" class="w-18"
+                         x-data="{ loading: false }" @click="loading = true" wire:navigate>
+                <span x-show="!loading">{{__('انصراف')}}</span>
+                <flux:icon.loading x-show="loading" class="size-5"/>
+            </flux:button>
         </div>
     </form>
 
@@ -193,7 +193,7 @@ new class extends Component {
 
 
     <div x-data="{ waiting: false }"
-         x-on:branch-updated.window="waiting = true; setTimeout(() => { window.location.href = '{{ route('branch.index') }}'}, 1000);">
+         x-on:branch-updated.window="waiting = true; setTimeout(() => { window.location.href = '{{ route('branch.index', ['highlight_id'=>$branch->id]) }}'}, 1500);">
         <!-- Overlay -->
         <div x-show="waiting" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
             <flux:callout icon="loading" color="lime" class="w-[350px]" inline>

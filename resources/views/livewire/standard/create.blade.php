@@ -53,12 +53,6 @@ new class extends Component {
         $this->calc_sum();
         $validated = $this->validate();
         $standard = Standard::create($validated);
-
-        Flux::toast(
-            heading: 'ثبت شد.',
-            text: 'استاندارد جدید با موفقیت ثبت شد.',
-            variant: 'success'
-        );
         $this->dispatch('standard-created');
         $this->standard_id = $standard->id;
     }
@@ -127,11 +121,11 @@ new class extends Component {
         </div>
 
         <div class="flex justify-between flex-row-reverse">
-            <flux:button type="submit" variant="primary" color="sky"
-                         class="cursor-pointer">{{__('ذخیره')}}</flux:button>
-            <flux:button wire:click="calc_sum" variant="primary" color="yellow"
+            <flux:button type="submit" variant="primary" color="blue"
+                         class="cursor-pointer">{{__('ثبت')}}</flux:button>
+            <flux:button wire:click="calc_sum" variant="primary" color="indigo"
                          class="cursor-pointer">{{__('محاسبه مجموع')}}</flux:button>
-            <flux:button href="{{route('standard.index', ['highlight_id' => '0'])}}" variant="primary" color="zinc" class="w-18"
+            <flux:button href="{{route('branch.index', ['highlight_id' => '0'])}}" variant="primary" color="zinc" class="w-18"
                          x-data="{ loading: false }" @click="loading = true" wire:navigate>
                 <span x-show="!loading">{{__('انصراف')}}</span>
                 <flux:icon.loading x-show="loading" class="size-5"/>
@@ -144,12 +138,12 @@ new class extends Component {
 
 
     <div x-data="{ waiting: false }"
-         x-on:standard-created.window="waiting = true; setTimeout(() => { window.location.href = '{{ route('standard.index', ['highlight_id'=>$standard_id]) }}'}, 1000);">
+         x-on:standard-created.window="waiting = true; setTimeout(() => { window.location.href = '{{ route('standard.index', ['highlight_id'=>$standard_id]) }}'}, 1500);">
         <!-- Overlay -->
         <div x-show="waiting" x-transition.opacity.duration.300ms x-cloak
              class="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
             <flux:callout icon="loading" color="emerald" class="w-[350px]" inline>
-                <flux:callout.heading>{{__('با موفقیت انجام شد.')}}</flux:callout.heading>
+                <flux:callout.heading>{{__('استاندارد جدید با موفقیت درج شد')}}</flux:callout.heading>
                 <flux:callout.text>{{__('در حال انتقال به لیست استانداردها ....')}}</flux:callout.text>
             </flux:callout>
         </div>

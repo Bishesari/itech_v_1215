@@ -24,6 +24,9 @@ new class extends Component {
     public string $phone = '';
     public string $mobile = '';
 
+    public int $branch_id = 0;
+
+
     protected function rules(): array
     {
         return [
@@ -47,14 +50,10 @@ new class extends Component {
 
         $validated = $this->validate();
 
-        Branch::create($validated);
+        $branch = Branch::create($validated);
 
-        Flux::toast(
-            heading: 'ثبت شد.',
-            text: 'شعبه جدید با موفقیت ثبت شد.',
-            variant: 'success'
-        );
         $this->dispatch('branch-created');
+        $this->branch_id = $branch->id;
     }
 
     #[On('province-created')]
@@ -92,7 +91,7 @@ new class extends Component {
 
     <div class="inline-flex mt-2 mb-4">
         <flux:breadcrumbs>
-            <flux:breadcrumbs.item href="{{route('branch.index')}}" wire:navigate x-data="{ loading: false }"
+            <flux:breadcrumbs.item href="{{route('branch.index', ['highlight_id' => '0'])}}" wire:navigate x-data="{ loading: false }"
                                    @click="loading = true">
                 <span x-show="!loading" class="text-blue-500">{{__('شعبه')}}</span>
                 <flux:icon.loading x-show="loading" class="size-5 animate-spin text-blue-500 mr-3"/>
@@ -157,11 +156,17 @@ new class extends Component {
         <x-my.flt_lbl name="mobile" label="{{__('موبایل:')}}" dir="ltr" maxlength="11"
                       class="tracking-wider font-semibold" required/>
 
+        <div class="flex justify-between flex-row-reverse">
+            <flux:button type="submit" variant="primary" color="blue"
+                         class="cursor-pointer">{{__('ثبت')}}</flux:button>
 
-        <div class="flex">
-            <flux:spacer/>
-            <flux:button type="submit" variant="primary" color="teal" class="cursor-pointer">{{__('ثبت')}}</flux:button>
+            <flux:button href="{{route('branch.index', ['highlight_id' => '0'])}}" variant="primary" color="zinc" class="w-18"
+                         x-data="{ loading: false }" @click="loading = true" wire:navigate>
+                <span x-show="!loading">{{__('انصراف')}}</span>
+                <flux:icon.loading x-show="loading" class="size-5"/>
+            </flux:button>
         </div>
+
     </form>
 
     <livewire:province.create :show_btn="false"/>
@@ -174,7 +179,7 @@ new class extends Component {
 
 
     <div x-data="{ waiting: false }"
-         x-on:branch-created.window="waiting = true; setTimeout(() => { window.location.href = '{{ route('branch.index') }}'}, 1000);">
+         x-on:branch-created.window="waiting = true; setTimeout(() => { window.location.href = '{{ route('branch.index', ['highlight_id'=>$branch_id]) }}'}, 1500);">
         <!-- Overlay -->
         <div x-show="waiting" x-transition.opacity.duration.300ms x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
             <flux:callout icon="loading" color="emerald" class="w-[350px]" inline>

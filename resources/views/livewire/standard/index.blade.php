@@ -1,7 +1,9 @@
 <?php
 
 use App\Models\Standard;
+use Flux\Flux;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Volt\Component;
 use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
@@ -18,10 +20,11 @@ new class extends Component {
 
     public function mount($highlight_id = null): void
     {
-        if ($highlight_id){
+        if ($highlight_id) {
             $this->afterComeBack($highlight_id);
         }
     }
+
     public function sort($column): void
     {
         if ($this->sortBy === $column) {
@@ -30,6 +33,7 @@ new class extends Component {
             $this->sortBy = $column;
             $this->sortDirection = 'asc';
         }
+        $this->resetPage();
     }
 
     #[Computed]
@@ -39,6 +43,23 @@ new class extends Component {
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->perPage);
     }
+
+    public function toggleStatus(int $standardId): void
+    {
+        $standard = Standard::findOrFail($standardId);
+
+        $standard->update([
+            'is_active' => !$standard->is_active,
+        ]);
+
+        Flux::toast(
+            heading: 'به‌روزرسانی شد',
+            text: 'وضعیت استاندارد با موفقیت تغییر کرد.',
+            variant: 'warning',
+            position: 'top right'
+        );
+    }
+
 
     public function afterComeBack($id = null): void
     {
@@ -54,6 +75,16 @@ new class extends Component {
 
         $this->highlightedStandardId = $standard->id;
     }
+
+    #[On('standard-deleted')]
+    public function afterDeleted(): void
+    {
+        $standards = $this->standards();
+        if ($standards->isEmpty() && $standards->currentPage() > 1) {
+            $this->previousPage();
+        }
+    }
+
 
 }; ?>
 
@@ -198,6 +229,7 @@ new class extends Component {
                                                          class="size-5 text-yellow-500"/>
                                 <flux:icon.loading x-show="loading" class="size-5 text-yellow-500"/>
                             </flux:link>
+                            <livewire:standard.delete :standard="$standard" :key="'standard-delete-'.$standard->id"/>
                         </div>
                     </flux:table.cell>
 

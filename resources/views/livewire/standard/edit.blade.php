@@ -59,12 +59,6 @@ new class extends Component {
         $this->calc_sum();
         $validated = $this->validate();
         $this->standard->update($validated);
-
-        Flux::toast(
-            heading: 'ثبت شد.',
-            text: 'استاندارد جدید با موفقیت ویرایش شد.',
-            variant: 'success'
-        );
         $this->dispatch('standard-updated');
     }
 
@@ -133,9 +127,9 @@ new class extends Component {
         </div>
 
         <div class="flex justify-between flex-row-reverse">
-            <flux:button type="submit" variant="primary" color="sky"
+            <flux:button type="submit" variant="primary" color="yellow"
                          class="cursor-pointer">{{__('ذخیره')}}</flux:button>
-            <flux:button wire:click="calc_sum" variant="primary" color="yellow"
+            <flux:button wire:click="calc_sum" variant="primary" color="indigo"
                          class="cursor-pointer">{{__('محاسبه مجموع')}}</flux:button>
             <flux:button href="{{route('standard.index', ['highlight_id' => '0'])}}" variant="primary" color="zinc" class="w-18"
                          x-data="{ loading: false }" @click="loading = true" wire:navigate>
@@ -150,12 +144,12 @@ new class extends Component {
 
 
     <div x-data="{ waiting: false }"
-         x-on:standard-updated.window="waiting = true; setTimeout(() => { window.location.href = '{{ route('standard.index', ['highlight_id'=>$standard->id]) }}'}, 1000);">
+         x-on:standard-updated.window="waiting = true; setTimeout(() => { window.location.href = '{{ route('standard.index', ['highlight_id'=>$standard->id]) }}'}, 1500);">
         <!-- Overlay -->
         <div x-show="waiting" x-transition.opacity.duration.300ms x-cloak
              class="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
             <flux:callout icon="loading" color="yellow" class="w-[350px]" inline>
-                <flux:callout.heading>{{__('با موفقیت انجام شد.')}}</flux:callout.heading>
+                <flux:callout.heading>{{__('با موفقیت ویرایش شد.')}}</flux:callout.heading>
                 <flux:callout.text>{{__('در حال انتقال به لیست استاندارد ها ....')}}</flux:callout.text>
             </flux:callout>
         </div>

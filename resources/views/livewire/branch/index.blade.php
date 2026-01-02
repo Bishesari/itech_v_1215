@@ -5,16 +5,24 @@ use Flux\Flux;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;
+use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
 
 new class extends Component {
-    use WithPagination;
+    use WithPagination, WithoutUrlPagination;
 
     public string $sortBy = 'id';
     public string $sortDirection = 'desc';
+    public int $perPage = 10;
 
-    protected array $sortable = ['code', 'abbr', 'short_name', 'province', 'city', 'credit_balance', 'created_at', 'updated_at'];
+    public ?int $highlightedBranchId = null;
 
+    public function mount($highlight_id = null): void
+    {
+        if ($highlight_id) {
+            $this->afterComeBack($highlight_id);
+        }
+    }
 
     public function sort(string $column): void
     {
@@ -28,24 +36,11 @@ new class extends Component {
     }
 
     #[Computed]
-    #[On('branch-deleted')]
     public function branches()
     {
         return Branch::query()
-            ->when($this->sortBy === 'province', function ($query) {
-                $query->join('provinces', 'branches.province_id', '=', 'provinces.id')
-                    ->orderBy('provinces.name_fa', $this->sortDirection)
-                    ->select('branches.*');
-            })
-            ->when($this->sortBy === 'city', function ($query) {
-                $query->join('cities', 'branches.city_id', '=', 'cities.id')
-                    ->orderBy('cities.name_fa', $this->sortDirection)
-                    ->select('branches.*');
-            })
-            ->when(!in_array($this->sortBy, ['province', 'city']), function ($query) {
-                $query->orderBy($this->sortBy, $this->sortDirection);
-            })
-            ->paginate(12);
+            ->orderBy($this->sortBy, $this->sortDirection)
+            ->paginate($this->perPage);
     }
 
     public function toggleStatus(int $branchId): void
@@ -56,14 +51,36 @@ new class extends Component {
             'is_active' => !$branch->is_active,
         ]);
 
-        $this->dispatch('branch-updated');
-
         Flux::toast(
             heading: 'به‌روزرسانی شد',
             text: 'وضعیت شعبه با موفقیت تغییر کرد.',
             variant: 'warning',
             position: 'top right'
         );
+    }
+
+    public function afterComeBack($id = null): void
+    {
+        $this->reset(['sortBy', 'sortDirection']);
+
+        $branch = Branch::find($id);
+        if (!$branch) {
+            return;
+        }
+        $beforeCount = Branch::where('id', '>', $branch->id)->count();
+        $page = intdiv($beforeCount, $this->perPage) + 1;
+        $this->gotoPage($page);
+
+        $this->highlightedBranchId = $branch->id;
+    }
+
+    #[On('branch-deleted')]
+    public function afterDeleted(): void
+    {
+        $branches = $this->branches();
+        if ($branches->isEmpty() && $branches->currentPage() > 1) {
+            $this->previousPage();
+        }
     }
 
 }; ?>
