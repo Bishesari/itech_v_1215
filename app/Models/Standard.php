@@ -10,6 +10,9 @@ class Standard extends Model
 {
     use HasJalaliDates;
 
+    protected $fillable = ['field_id', 'code', 'name_fa', 'name_en', 'nazari_h', 'amali_h', 'karvarzi_h', 'project_h', 'required_h' ,'sum_h'];
+
+
     public function field():BelongsTo{
         return $this->belongsTo(Field::class);
     }

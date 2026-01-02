@@ -102,7 +102,7 @@ class extends Component {
         <flux:button wire:loading.remove wire:target="setRole" wire:click="dashboard" variant="primary" color="indigo"
                      class="cursor-pointer w-full py-2 text-sm font-medium relative" x-data="{ loading: false }" @click="loading = true">
             <span x-show="!loading">{{ __('ادامه با نقش انتخابی') }}</span>
-            <flux:icon.loading x-show="loading" class="inline mr-2 size-5"/>
+            <flux:icon.loading x-show="loading" class="size-5"/>
         </flux:button>
 
         <flux:button wire:loading wire:target="setRole"

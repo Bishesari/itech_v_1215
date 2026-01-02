@@ -32,7 +32,7 @@
         <flux:icon.loading x-show="loading" class="inline absolute left-2 size-3.5 text-stone-500"/>
     </flux:navlist.item>
 
-    <flux:navlist.item icon="user-group" :href="route('standard.index')" :current="request()->routeIs('standard.index')" wire:navigate x-data="{ loading: false }"
+    <flux:navlist.item icon="user-group" :href="route('standard.index', ['highlight_id'=>0])" :current="request()->routeIs('standard.index')" wire:navigate x-data="{ loading: false }"
                        @click="loading = true">
         <span>{{ __('استانداردها') }}</span>
         <flux:icon.loading x-show="loading" class="inline absolute left-2 size-3.5 text-stone-500"/>

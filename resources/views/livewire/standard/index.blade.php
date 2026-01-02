@@ -15,6 +15,13 @@ new class extends Component {
 
     public ?int $highlightedStandardId = null;
 
+
+    public function mount($highlight_id = null): void
+    {
+        if ($highlight_id){
+            $this->afterComeBack($highlight_id);
+        }
+    }
     public function sort($column): void
     {
         if ($this->sortBy === $column) {
@@ -33,6 +40,21 @@ new class extends Component {
             ->paginate($this->perPage);
     }
 
+    public function afterComeBack($id = null): void
+    {
+        $this->reset(['sortBy', 'sortDirection']);
+
+        $standard = Standard::find($id);
+        if (!$standard) {
+            return;
+        }
+        $beforeCount = Standard::where('name_fa', '<', $standard->name_fa)->count();
+        $page = intdiv($beforeCount, $this->perPage) + 1;
+        $this->gotoPage($page);
+
+        $this->highlightedStandardId = $standard->id;
+    }
+
 }; ?>
 
 <div>
@@ -42,7 +64,7 @@ new class extends Component {
     <div class="inline-flex mt-2 mb-4">
         <flux:text>{{__('استانداردهای آموزشی')}}</flux:text>
         <flux:tooltip content="استاندارد جدید" position="left">
-            <flux:link href="{{ route('branch.create') }}" wire:navigate x-data="{ loading: false }"
+            <flux:link href="{{ route('standard.create') }}" wire:navigate x-data="{ loading: false }"
                        @click="loading = true">
                 {{-- آیکن پلاس --}}
                 <flux:icon.plus-circle x-show="!loading" variant="micro" class="size-5 text-blue-500 mr-3"/>
@@ -112,7 +134,8 @@ new class extends Component {
                 @if($highlightedStandardId === $standard->id)
                     @php($class='bg-green-100 dark:bg-green-900/40')
                 @endif
-                <flux:table.row class="{{$class}} dark:hover:bg-stone-900/80 transition duration-300 hover:bg-zinc-100" :key="$standard->id">
+                <flux:table.row class="{{$class}} dark:hover:bg-stone-900/80 transition duration-300 hover:bg-zinc-100"
+                                :key="$standard->id">
                     <flux:table.cell>
                         <flux:heading class="flex items-center gap-1">
                             {{$standard->id}}
@@ -169,33 +192,13 @@ new class extends Component {
 
                     <flux:table.cell>
                         <div class="inline-flex items-center gap-2">
-                            {{--  Edit Modal Button  --}}
-                            <div x-data="{ loading: false }"
-                                 @click.prevent="if (loading) return; loading = true; setTimeout(() => loading = false, 400);">
-                                <flux:tooltip content="ویرایش رشته" position="bottom">
-
-                                    <flux:icon.pencil-square x-show="!loading" variant="micro"
-                                                             class="cursor-pointer size-5 text-yellow-500"
-                                                             wire:click="$dispatchTo('field.edit', 'show-edit-modal', { field: {{ $standard }} })"
-                                    />
-                                    <flux:icon.loading x-show="loading" class="size-4 text-yellow-500"/>
-                                </flux:tooltip>
-                            </div>
-
-                            <div x-data="{ loading: false }"
-                                 @@click.prevent="if (loading) return; loading = true; setTimeout(() => loading = false, 500);">
-                                <flux:tooltip content="حذف رشته" position="bottom">
-                                    <flux:icon.trash x-show="!loading" variant="micro"
-                                                     class="cursor-pointer size-5 text-red-500"
-                                                     wire:click="$dispatchTo('field.delete', 'show-delete-modal', { field: {{ $standard }} })"
-                                    />
-                                    <flux:icon.loading x-show="loading" class="size-4 text-red-500"/>
-                                </flux:tooltip>
-                            </div>
-
+                            <flux:link href="{{ route('standard.edit', $standard) }}" variant="subtle" wire:navigate
+                                       x-data="{ loading: false }" @click="loading = true">
+                                <flux:icon.pencil-square variant="micro" x-show="!loading"
+                                                         class="size-5 text-yellow-500"/>
+                                <flux:icon.loading x-show="loading" class="size-5 text-yellow-500"/>
+                            </flux:link>
                         </div>
-
-
                     </flux:table.cell>
 
                 </flux:table.row>

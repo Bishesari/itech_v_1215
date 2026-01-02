@@ -9,6 +9,8 @@ new class extends Component {
 
     public string $title = '';
 
+    public bool $show_btn = true;
+
     protected function rules(): array
     {
         return [
@@ -40,11 +42,12 @@ new class extends Component {
 }; ?>
 
 <div>
-    <flux:tooltip content="رشته جدید" position="left">
-        <flux:icon.plus-circle variant="micro" class="cursor-pointer size-5 text-blue-500 mr-4"
-                               x-on:click="$flux.modal('new-field').show()"/>
-    </flux:tooltip>
-
+    @if($show_btn)
+        <flux:tooltip content="رشته جدید" position="left">
+            <flux:icon.plus-circle variant="micro" class="cursor-pointer size-5 text-blue-500 mr-4"
+                                   x-on:click="$flux.modal('new-field').show()"/>
+        </flux:tooltip>
+    @endif
     <flux:modal name="new-field" :show="$errors->isNotEmpty()" focusable class="md:w-96" @close="reset_prop"
                 :dismissible="false">
         <div class="space-y-6">
