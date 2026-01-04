@@ -2,16 +2,16 @@
 
 use App\Models\City;
 use App\Models\Province;
-use App\Models\Role;
 use Flux\Flux;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;
+use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
 
 new class extends Component {
     public Province $province;
-    use WithPagination;
+    use WithPagination, WithoutUrlPagination;
 
     public string $sortBy = 'name_fa';
     public string $sortDirection = 'asc';
@@ -37,6 +37,7 @@ new class extends Component {
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->perPage);
     }
+
 
     public function toggleStatus(int $cityId): void
     {
@@ -144,7 +145,8 @@ new class extends Component {
         <flux:table.rows>
 
             @foreach ($this->cities as $city)
-                <flux:table.row class="transition duration-500 {{ $highlightCityId === $city->id ? 'bg-green-100 dark:bg-green-900/40' : '' }}">
+                <flux:table.row
+                    class="transition duration-500 {{ $highlightCityId === $city->id ? 'bg-green-100 dark:bg-green-900/40' : '' }}">
                     <flux:table.cell>{{ $city->id }}</flux:table.cell>
                     <flux:table.cell>{{ $city->name_fa }}</flux:table.cell>
                     <flux:table.cell>{{ $city->name_en }}</flux:table.cell>

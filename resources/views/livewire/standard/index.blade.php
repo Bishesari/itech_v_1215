@@ -169,7 +169,6 @@ new class extends Component {
                                 :key="$standard->id">
                     <flux:table.cell>
                         <flux:heading class="flex items-center gap-1">
-                            {{$standard->id}}
                             <flux:tooltip toggleable position="left">
                                 <flux:button icon="information-circle" size="sm" variant="ghost"
                                              class="cursor-pointer"/>
@@ -183,6 +182,7 @@ new class extends Component {
                                     </p>
                                 </flux:tooltip.content>
                             </flux:tooltip>
+                            {{$standard->id}}
                         </flux:heading>
 
                     </flux:table.cell>
