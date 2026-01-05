@@ -125,7 +125,7 @@ new class extends Component {
                          class="cursor-pointer">{{__('ثبت')}}</flux:button>
             <flux:button wire:click="calc_sum" variant="primary" color="indigo"
                          class="cursor-pointer">{{__('محاسبه مجموع')}}</flux:button>
-            <flux:button href="{{route('branch.index', ['highlight_id' => '0'])}}" variant="primary" color="zinc" class="w-18"
+            <flux:button href="{{route('standard.index', ['highlight_id' => '0'])}}" variant="primary" color="zinc" class="w-18"
                          x-data="{ loading: false }" @click="loading = true" wire:navigate>
                 <span x-show="!loading">{{__('انصراف')}}</span>
                 <flux:icon.loading x-show="loading" class="size-5"/>
