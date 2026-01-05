@@ -160,7 +160,7 @@ new class extends Component {
                             </div>
 
                             <div x-data="{ loading: false }"
-                                 @@click.prevent="if (loading) return; loading = true; setTimeout(() => loading = false, 500);">
+                                 @click.prevent="if (loading) return; loading = true; setTimeout(() => loading = false, 500);">
                                 <flux:tooltip content="حذف رشته" position="bottom">
                                     <flux:icon.trash x-show="!loading" variant="micro"
                                                      class="cursor-pointer size-5 text-red-500"

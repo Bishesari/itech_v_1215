@@ -10,7 +10,9 @@ new class extends Component {
     public Standard $standard;
 
     #[On('chapter-created')]
-    public function chapter_created(): void
+    #[On('chapter-updated')]
+    #[On('chapter-deleted')]
+    public function afterChange(): void
     {
         $this->dispatch('reloadPage');;
     }
@@ -57,7 +59,7 @@ new class extends Component {
 
         <flux:table.rows>
             @foreach ($this->standard->chapters as $chapter)
-                <flux:table.row>
+                <flux:table.row class="dark:hover:bg-stone-900/80 transition duration-300 hover:bg-zinc-100">
                     <flux:table.cell class="text-center">{{ $chapter->id }}</flux:table.cell>
                     <flux:table.cell class="text-center">{{ $chapter->number }}</flux:table.cell>
                     <flux:table.cell>{{ $chapter->title }}</flux:table.cell>
@@ -74,17 +76,41 @@ new class extends Component {
                         <div class="text-xs">{{ substr($chapter->jalali_updated_at, 11, 5) }}</div>
                     </flux:table.cell>
 
-
                     <flux:table.cell>
                         <div class="inline-flex items-center gap-2">
-                            {{--                            <livewire:province.city.edit :$city :key="'city-edit-'.$city->id"/>--}}
-                            {{--                            <livewire:province.city.delete :$city :key="'city-delete-'.$city->id"/>--}}
+                            {{--  Edit Modal Button  --}}
+                            <div x-data="{ loading: false }"
+                                 @click.prevent="if (loading) return; loading = true; setTimeout(() => loading = false, 400);">
+                                <flux:tooltip content="ویرایش" position="bottom">
+
+                                    <flux:icon.pencil-square x-show="!loading" variant="micro"
+                                                             class="cursor-pointer size-5 text-yellow-500"
+                                                             wire:click="$dispatchTo('standard.chapter.edit', 'show-edit-modal', { chapter: {{ $chapter }} })"
+                                    />
+                                    <flux:icon.loading x-show="loading" class="size-4 text-yellow-500"/>
+                                </flux:tooltip>
+                            </div>
+
+                            <div x-data="{ loading: false }"
+                                 @click.prevent="if (loading) return; loading = true; setTimeout(() => loading = false, 500);">
+                                <flux:tooltip content="حذف" position="bottom">
+                                    <flux:icon.trash x-show="!loading" variant="micro"
+                                                     class="cursor-pointer size-5 text-red-500"
+                                                     wire:click="$dispatchTo('standard.chapter.delete', 'show-delete-modal', { chapter: {{ $chapter }} })"
+                                    />
+                                    <flux:icon.loading x-show="loading" class="size-4 text-red-500"/>
+                                </flux:tooltip>
+                            </div>
+
                         </div>
+
                     </flux:table.cell>
                 </flux:table.row>
             @endforeach
         </flux:table.rows>
     </flux:table>
 
+    <livewire:standard.chapter.edit />
+    <livewire:standard.chapter.delete />
 
 </div>

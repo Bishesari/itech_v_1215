@@ -112,9 +112,9 @@ new class extends Component {
 
         <flux:table.columns>
 
-            <flux:table.column sortable :sorted="$sortBy === 'id'" :direction="$sortDirection"
+            <flux:table.column align="center" sortable :sorted="$sortBy === 'id'" :direction="$sortDirection"
                                wire:click="sort('id')">
-                {{__('#')}}
+                {{__('شناسه')}}
             </flux:table.column>
 
             <flux:table.column>{{__('رشته')}}</flux:table.column>
@@ -182,7 +182,9 @@ new class extends Component {
                                     </p>
                                 </flux:tooltip.content>
                             </flux:tooltip>
-                            {{$standard->id}}
+                            <span class="pt-1">{{$standard->id}}</span>
+
+
                         </flux:heading>
 
                     </flux:table.cell>
@@ -223,6 +225,11 @@ new class extends Component {
 
                     <flux:table.cell>
                         <div class="inline-flex items-center gap-2">
+                            <flux:link href="{{ route('chapter.index', $standard) }}" variant="subtle" wire:navigate x-data="{ loading: false }" @click="loading = true">
+                                <span x-show="!loading" class="text-blue-500">{{ __('فصلها') }}</span>
+                                <flux:icon.loading x-show="loading" class="size-5 text-blue-500 mr-3"/>
+                            </flux:link>
+
                             <flux:link href="{{ route('standard.edit', $standard) }}" variant="subtle" wire:navigate
                                        x-data="{ loading: false }" @click="loading = true">
                                 <flux:icon.pencil-square variant="micro" x-show="!loading"
