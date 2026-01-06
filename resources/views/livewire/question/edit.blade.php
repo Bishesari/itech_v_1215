@@ -1,75 +1,81 @@
 <?php
 
-use App\Models\Option;
 use App\Models\Question;
-use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
 use Livewire\Volt\Component;
 
-new class extends Component {
+new class extends Component
+{
+
+    public Question $question;
+
     public string $standard_id = '';
     public string $chapter_id = '';
 
-    public string $text = '';
-    public bool $is_final = false;
-    public string $difficulty = 'easy';
-    public array $options = ['', '', '', ''];
+    public array $options = [];
     public array $dir = [false, false, false, false];
-    public int $correct = 0;
 
-    public function mount($sid, $cid)
+    public string $difficulty = '';
+    public int $correct;
+    public bool $is_final;
+
+    public string $text = '';
+
+    public function mount()
     {
-        $this->standard_id = $sid;
-        $this->chapter_id = $cid;
+        $this->text = $this->question->text;
+        $this->standard_id = $this->question->chapter->standard->id;
+        $this->chapter_id = $this->question->chapter->id;
+        $this->difficulty = $this->question->difficulty;
+        $this->is_final = $this->question->is_final;
+
+        foreach ($this->question->options as $i => $option) {
+            $this->options[$i] = $option['text'];
+            $this->dir[$i] = ($option['dir'] === 'ltr');
+            if ($option['is_correct'] == 1) {
+                $this->correct = $i;
+            }
+        }
     }
 
-    protected function rules(): array
+    public function update_question(): void
     {
-        return [
-            'standard_id' => ['required', 'numeric'],
-            'chapter_id' => ['required', 'numeric'],
-            'text' => ['required', 'min:3'],
-            'options.*' => ['required', 'min:3']
-        ];
-    }
-
-    public function add_question(): void
-    {
-        $question = Question::create([
+        $question = $this->question;
+        $question->update([
             'chapter_id' => $this->chapter_id,
             'text' => $this->text,
             'difficulty' => $this->difficulty,
             'is_final' => $this->is_final,
-            'assigned_by' => Auth::user()->id,
+            'assigned_by' => Auth::id(),
         ]);
+        foreach ($question->options as $i => $opt) {
 
-        foreach ($this->options as $index => $text) {
-            if ($this->dir[$index]) {
-                $dir = 'ltr';
-            } else {
-                $dir = 'rtl';
-            }
-            Option::create([
-                'question_id' => $question->id,
-                'text' => $text,
+            if ($this->dir[$i]) {$dir = 'ltr';} else {$dir = 'rtl';}
+            $is_correct = $i == $this->correct;
+            $opt->update([
+                'text' => $this->options[$i],
                 'dir' => $dir,
-                'is_correct' => $index == $this->correct,
+                'is_correct' => $is_correct,
             ]);
+
         }
-        $url = route('question.index', ['sid' => $this->standard_id, 'cid' => $this->chapter_id]);
+        $url = URL::signedRoute('questions', ['sid' => $this->standard_id, 'cid' => $this->chapter_id]);
         redirect($url);
-    }
+}
+
+
 }; ?>
 
-<section class="w-full">
 
+<section class="w-full">
     <div class="relative w-full mb-2">
         <flux:heading size="xl" level="1">{{ __('سوالات فصل') }}</flux:heading>
-        <flux:text color="blue" size="lg" class="my-2">{{ __('بخش درج سوال جدید') }}</flux:text>
+        <flux:text color="blue" size="lg" class="my-2">{{ __('بخش ویرایش سوال') }}</flux:text>
         <flux:separator variant="subtle"/>
     </div>
-    <form wire:submit="add_question" class="grid mt-5 sm:w-[400px]" autocomplete="off" autofocus>
+    <form wire:submit="update_question" class="grid mt-5 sm:w-[400px]" autocomplete="off" autofocus>
+
 
         <!-- Standard select menu... -->
         <flux:select wire:model.live="standard_id" variant="listbox" placeholder="استانداردی انتخاب کنید ..."
@@ -115,7 +121,7 @@ new class extends Component {
         </div>
 
         <div class="flex justify-between">
-            <flux:button href="{{route('question.index', ['sid'=>$standard_id, 'cid'=>$chapter_id] )}}"
+            <flux:button href="{{URL::signedRoute('questions', ['sid'=>$question->chapter->standard->id, 'cid'=> $question->chapter->id] )}}"
                          variant="primary" color="zinc" wire:navigate
                          size="sm" tabindex="-1">{{__('انصراف')}}</flux:button>
             <flux:field variant="inline">

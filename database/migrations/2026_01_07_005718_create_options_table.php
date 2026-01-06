@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('choices', function (Blueprint $table) {
+        Schema::create('options', function (Blueprint $table) {
             $table->id();
             $table->foreignId('question_id')->constrained()->cascadeOnDelete();
-            $table->text('text'); // متن گزینه
-            $table->string('image_path')->nullable(); // عکس گزینه (اختیاری)
-            $table->boolean('is_correct')->default(false); // آیا این گزینه صحیح است؟
+            $table->string('text')->nullable(); // متن گزینه
+            $table->enum('dir', ['rtl', 'ltr'])->default('rtl'); // قالب نوشتار
+            $table->boolean('is_correct')->default(false); // اگر این گزینه صحیح است
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('choices');
+        Schema::dropIfExists('options');
     }
 };

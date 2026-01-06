@@ -39,3 +39,8 @@
     </flux:navlist.item>
 
 </flux:navlist.group>
+
+<flux:navlist.group :heading="__('بانک سوال')" class="grid" expandable :expanded="request()->routeIs(['question.index', 'question.create'])" >
+    <flux:navlist.item icon="user-group" href="{{route('question.index', ['sid'=>0, 'cid'=>0] )}}" :current="request()->routeIs('question.index')" wire:navigate>{{ __('کل سوالات') }}</flux:navlist.item>
+    <flux:navlist.item icon="user-group" href="{{route('question.create', ['sid'=>0, 'cid'=>0] )}}" :current="request()->routeIs('question.create')" wire:navigate>{{ __('درج سوال') }}</flux:navlist.item>
+</flux:navlist.group>
