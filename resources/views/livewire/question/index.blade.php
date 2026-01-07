@@ -83,7 +83,7 @@ new class extends Component {
                 : {{$question->chapter->title}} {{'( ' . $question->chapter->standard->name_fa . ' )'}} {{'( '. $question->maker->profile->l_name_fa . ' )'}}</flux:text>
 
             <x-slot name="actions">
-                <flux:button variant="subtle" href="{{URL::signedRoute('question.edit', ['question'=>$question] )}}" size="xs">
+                <flux:button variant="subtle" href="{{route('question.edit', ['question'=>$question] )}}" size="xs">
                     {{__('ویرایش')}}
                 </flux:button>
             </x-slot>

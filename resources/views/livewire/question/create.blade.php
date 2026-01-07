@@ -2,14 +2,13 @@
 
 use App\Models\Option;
 use App\Models\Question;
-use Flux\Flux;
+use App\Models\Standard;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\URL;
 use Livewire\Volt\Component;
 
 new class extends Component {
-    public string $standard_id = '';
-    public string $chapter_id = '';
+    public int $standard_id = 0;
+    public int $chapter_id = 0;
 
     public string $text = '';
     public bool $is_final = false;
@@ -27,15 +26,23 @@ new class extends Component {
     protected function rules(): array
     {
         return [
-            'standard_id' => ['required', 'numeric'],
-            'chapter_id' => ['required', 'numeric'],
-            'text' => ['required', 'min:3'],
-            'options.*' => ['required', 'min:3']
+            'standard_id' => ['required', 'numeric', 'exists:standards,id'],
+            'chapter_id' => ['required', 'numeric', 'exists:chapters,id'],
+            'text' => ['required', 'string', 'min:3', 'max:1000'],
+            'options' => ['required', 'array', 'size:4'],
+            'options.*' => ['required', 'string', 'min:1', 'max:500'],
+            'correct' => ['required', 'integer', 'min:0', 'max:3'],
+            'difficulty' => ['required', 'in:easy,medium,hard'],
+            'is_final' => ['boolean'],
+            'dir' => ['required', 'array', 'size:4'],
+            'dir.*' => ['boolean'],
         ];
     }
 
     public function add_question(): void
     {
+        $this->validate();
+
         $question = Question::create([
             'chapter_id' => $this->chapter_id,
             'text' => $this->text,
@@ -62,18 +69,52 @@ new class extends Component {
     }
 }; ?>
 
-<section class="w-full">
 
-    <div class="relative w-full mb-2">
-        <flux:heading size="xl" level="1">{{ __('سوالات فصل') }}</flux:heading>
-        <flux:text color="blue" size="lg" class="my-2">{{ __('بخش درج سوال جدید') }}</flux:text>
-        <flux:separator variant="subtle"/>
+<div>
+
+    <flux:heading size="lg" level="1">
+        {{__('بانک سوال')}}
+    </flux:heading>
+    <div class="inline-flex mt-2 mb-4">
+        <flux:breadcrumbs>
+
+            <flux:breadcrumbs.item href="{{route('question.index', ['sid' => $standard_id, 'cid' => 0])}}"
+                                   wire:navigate x-data="{ loading: false }"
+                                   @click="loading = true">
+                <span x-show="!loading" class="text-blue-500">
+                    @if($standard_id)
+                        {{ \App\Models\Standard::find($standard_id)?->name_fa ?? 'نامشخص' }}
+                    @else
+                        {{__('استاندارد')}}
+                    @endif
+                </span>
+                <flux:icon.loading x-show="loading" class="size-5 animate-spin text-blue-500 mr-3"/>
+            </flux:breadcrumbs.item>
+
+            <flux:breadcrumbs.item href="{{route('question.index', ['sid' => $standard_id, 'cid' => $chapter_id])}}"
+                                   wire:navigate x-data="{ loading: false }"
+                                   @click="loading = true">
+                <span x-show="!loading" class="text-blue-500">
+                    @if($chapter_id)
+                        {{ \App\Models\Chapter::find($chapter_id)?->title ?? 'نامشخص' }}
+                    @else
+                        {{__('سرفصل')}}
+                    @endif
+                </span>
+                <flux:icon.loading x-show="loading" class="size-5 animate-spin text-blue-500 mr-3"/>
+            </flux:breadcrumbs.item>
+
+            <flux:breadcrumbs.item>{{__('جدید')}}</flux:breadcrumbs.item>
+        </flux:breadcrumbs>
     </div>
-    <form wire:submit="add_question" class="grid mt-5 sm:w-[400px]" autocomplete="off" autofocus>
+    <flux:separator variant="subtle"/>
+
+    <form wire:submit.prevent="add_question" class="grid w-[400px] gap-y-5 mt-5" autocomplete="off" autofocus>
+
 
         <!-- Standard select menu... -->
         <flux:select wire:model.live="standard_id" variant="listbox" placeholder="استانداردی انتخاب کنید ..."
-                     label="استاندارد" searchable class="mb-5">
+                     label="استاندارد" searchable>
             @foreach (\App\Models\Standard::all() as $standard)
                 <flux:select.option value="{{$standard->id}}">{{ $standard->name_fa }}</flux:select.option>
             @endforeach
@@ -82,23 +123,25 @@ new class extends Component {
         <!-- Chapter select menu... -->
         <flux:select wire:model.live="chapter_id" wire:key="{{ $standard_id }}" variant="listbox"
                      placeholder="سرفصل را انتخاب کنید ..."
-                     label="فصل" class="mb-5">
+                     label="فصل">
             @foreach (\App\Models\Chapter::whereStandardId($standard_id)->get() as $chapter)
                 <flux:select.option value="{{$chapter->id}}">{{ $chapter->title }}</flux:select.option>
             @endforeach
         </flux:select>
 
-        <flux:textarea rows="4" wire:model="text" label="متن سوال" resize="none" class="mb-6"/>
+        <flux:textarea rows="4" wire:model="text" label="متن سوال" resize="none"/>
 
         @foreach ($options as $i => $opt)
-            <div class="flex justify-between mb-0.5">
-                <flux:label>{{__('گزینه '). $i+1 }}</flux:label>
-                <flux:checkbox wire:model="dir.{{ $i }}" label="متن لاتین (چپ به راست)"/>
+            <div>
+                <div class="flex justify-between mb-0.5">
+                    <flux:label>{{__('گزینه '). $i+1 }}</flux:label>
+                    <flux:checkbox wire:model="dir.{{ $i }}" label="متن لاتین (چپ به راست)"/>
+                </div>
+                <flux:textarea rows="2" wire:model="options.{{ $i }}" resize="none"/>
             </div>
-            <flux:textarea rows="2" wire:model="options.{{ $i }}" resize="none" class="mb-5"/>
         @endforeach
 
-        <div class="grid grid-cols-2 gap-4 mb-5">
+        <div class="grid grid-cols-2 gap-4">
             <flux:select variant="listbox" wire:model="difficulty" placeholder="انتخاب کنید..." label="سختی سوال"
                          clearable>
                 @foreach (\App\Models\Question::CLUSTERS as $key => $label)
@@ -106,8 +149,7 @@ new class extends Component {
                 @endforeach
             </flux:select>
 
-            <flux:select variant="listbox" wire:model="correct" placeholder="انتخاب کنید..." label="گزینه صحیح"
-                         clearable>
+            <flux:select variant="listbox" wire:model="correct" placeholder="انتخاب کنید..." label="گزینه صحیح" clearable>
                 @foreach ($options as $i => $opt)
                     <flux:select.option value="{{$i}}">{{__('گزینه '). $i+1 }}</flux:select.option>
                 @endforeach
@@ -127,4 +169,4 @@ new class extends Component {
         </div>
 
     </form>
-</section>
+</div>
