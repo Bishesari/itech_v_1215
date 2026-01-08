@@ -9,7 +9,7 @@ trait HasJalaliDates
     /**
      * گرفتن تاریخ شمسی از فیلد دلخواه مدل
      */
-    public function getJalaliDate($field, $format = 'Y/m/d H:i')
+    public function getJalaliDate($field, $format = 'Y/m/d H:i l')
     {
         $date = $this->{$field};
         if (!$date) return null;

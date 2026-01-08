@@ -39,6 +39,7 @@ new class extends Component {
                 session([
                     'active_role_id' => $role->role_id,
                     'active_branch_id' => $role->branch_id, // null برای global
+                    'color' => $role->color
                 ]);
                 if ($this->context === 'modal') {
                     $this->dispatch('reloadPage');

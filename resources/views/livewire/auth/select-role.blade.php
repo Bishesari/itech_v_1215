@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Volt\Component;
@@ -13,6 +12,7 @@ class extends Component {
 
     public ?int $selectedRoleId = null;
     public ?int $selectedBranchId = null;
+    public string $r_color = '';
 
     public function mount(): void
     {
@@ -24,6 +24,7 @@ class extends Component {
             session([
                 'active_role_id'   => $role->role_id,
                 'active_branch_id' => $role->branch_id,
+                'color' => $role->color
             ]);
 
             $this->redirectIntended('dashboard', navigate: true);
@@ -32,10 +33,11 @@ class extends Component {
         $this->roles = $roles;
     }
 
-    public function setRole($roleId, $branch_id): void
+    public function setRole($roleId, $branch_id, $co): void
     {
         $this->selectedRoleId = $roleId;
         $this->selectedBranchId = $branch_id;
+        $this->r_color = $co;
     }
 
 
@@ -48,6 +50,7 @@ class extends Component {
         session([
             'active_role_id'   => $this->selectedRoleId,
             'active_branch_id' => $this->selectedBranchId ?? '',
+            'color' => $this->r_color
         ]);
         // ✅ همه‌چیز اوکیه، هدایت به داشبورد
         $this->redirectIntended('dashboard', navigate: true);
@@ -65,28 +68,19 @@ class extends Component {
             {{ __('برای ورود، یکی از نقش‌های زیر را انتخاب کنید') }}
         </p>
     </div>
-
     <!-- Roles -->
     <flux:radio.group variant="cards" class="grid gap-4">
         @forelse($roles as $r)
-            <flux:radio
-                wire:click="setRole({{ $r->role_id }}, {{ $r->branch_id ?? 'null' }})"
-                class="cursor-pointer {{ $selectedRoleId == $r->role_id ? 'text-green-600 dark:text-green-500' : 'text-gray-600 dark:text-gray-400' }} "
-            >
-                <div class="flex items-center justify-between w-full">
-                    <!-- نقش (سمت راست) -->
-                    <span class="font-semibold">
-                        {{ $r->role_name }}
-                    </span>
-
-                    <!-- شعبه (سمت چپ) -->
+            <flux:callout wire:click="setRole( {{ $r->role_id }}, {{ $r->branch_id ?? 'null' }}, '{{ $r->role_color }}' )"
+                color="{{ $selectedRoleId == $r->role_id ?  $r->role_color  : 'zinc' }}" class="cursor-pointer">
+                <flux:callout.heading class="flex justify-between">
+                    <span>{{ $r->role_name }}</span>
                     @if($r->branch_name)
-                        <span class="text-sm">
-                           {{__('شعبه ')}} {{ $r->branch_name }}
-                        </span>
+                        <span class="text-xs font-light">{{__('شعبه : ')}} {{ $r->branch_name }}</span>
                     @endif
-                </div>
-            </flux:radio>
+                </flux:callout.heading>
+            </flux:callout>
+
         @empty
             <p class="text-center text-gray-500 dark:text-gray-400">شما هیچ نقشی ندارید.</p>
         @endforelse

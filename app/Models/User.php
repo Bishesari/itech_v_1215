@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasJalaliDates;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -12,7 +13,8 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 
 class User extends Authenticatable
 {
-    use Notifiable, TwoFactorAuthenticatable;
+    use Notifiable, TwoFactorAuthenticatable, HasJalaliDates;
+
     protected $fillable = ['user_name', 'password'];
     protected $hidden = ['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'];
     protected function casts(): array
@@ -60,7 +62,8 @@ class User extends Authenticatable
             ->leftJoin('branches', 'branch_role_user.branch_id', '=', 'branches.id')
             ->where('branch_role_user.user_id', $this->id)
             ->select(
-                'roles.id as role_id', 'roles.name_fa as role_name', 'branches.id as branch_id', 'branches.short_name as branch_name'
+                'roles.id as role_id', 'roles.name_fa as role_name', 'branches.id as branch_id', 'branches.short_name as branch_name',
+                'roles.color as role_color'
             )
             ->get();
     }

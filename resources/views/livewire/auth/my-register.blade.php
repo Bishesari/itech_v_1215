@@ -263,6 +263,7 @@ new class extends Component {
             session([
                 'active_role_id' => 1,
                 'active_branch_id' => null,
+                'color' => 'teal'
             ]);
         });
 

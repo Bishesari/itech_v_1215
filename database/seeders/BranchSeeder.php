@@ -25,5 +25,18 @@ class BranchSeeder extends Seeder
             'mobile' => '09350568163',
             'credit_balance' => 100000000,
         ]);
+        Branch::create([
+            'code' => 'BUS-002',
+            'short_name' => 'آی کد',
+            'full_name' => 'آموزشگاه نخبگان آی کد',
+            'abbr' => 'ICC',
+            'province_id' => 1,
+            'city_id' => 1,
+            'address' => 'خیابان سنگی، ابتدای کوچه گلخانه، نبش بهشت1، ساختمان سیراف5، طبقه اول، واحد 3',
+            'postal_code' => '7514977863',
+            'phone' => '07733543850',
+            'mobile' => '09350568163',
+            'credit_balance' => 100000000,
+        ]);
     }
 }
