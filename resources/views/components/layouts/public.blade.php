@@ -9,7 +9,7 @@
     <flux:sidebar.toggle class="lg:hidden cursor-pointer" icon="bars-2" inset="left" />
     <flux:brand href="{{route('home')}}">
         <x-slot name="logo" class="max-lg:size-16 size-22">
-            <x-logo class="text-zinc-700 dark:text-zinc-300"/>
+            <x-logo class="text-zinc-700 dark:text-zinc-300 animate-pulse"/>
         </x-slot>
     </flux:brand>
 
@@ -33,7 +33,7 @@
 
     @auth()
     <flux:dropdown position="top" align="start">
-        <flux:profile avatar="https://fluxui.dev/img/demo/user.png" />
+        <flux:profile avatar="" />
         <flux:menu>
             <flux:menu.radio.group>
                 <flux:menu.radio checked>Olivia Martin</flux:menu.radio>
@@ -69,6 +69,7 @@
             <flux:button variant="subtle" size="sm" class="cursor-pointer">
                 {{__('ثبت نام')}}
             </flux:button>
+
         </flux:modal.trigger>
 
         {{---------- Register Modal ----------}}
@@ -84,7 +85,7 @@
     <flux:sidebar.header>
         <flux:sidebar.brand href="{{route('home')}}">
             <x-slot name="logo" class="size-16">
-                <x-logo class="text-zinc-700 dark:text-zinc-300"/>
+                <x-logo class="text-zinc-700 dark:text-zinc-300 animate-pulse"/>
             </x-slot>
         </flux:sidebar.brand>
         <flux:sidebar.collapse class="in-data-flux-sidebar-on-desktop:not-in-data-flux-sidebar-collapsed-desktop:-mr-2"/>
@@ -114,6 +115,7 @@
 @include('partials.foot')
 
 @fluxScripts
+<flux:toast />
 <script>
     document.addEventListener('reloadPage', () => {
         location.reload();

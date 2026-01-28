@@ -3,6 +3,7 @@
 
 use App\Models\User;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Volt\Component;
 use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
@@ -13,6 +14,9 @@ new class extends Component {
     public string $sortBy = 'id';
     public string $sortDirection = 'desc';
     public int $perPage = 10;
+
+    public ?int $highlightedUserId = null;
+
 
     public function sort($column): void
     {
@@ -33,6 +37,21 @@ new class extends Component {
             ->paginate($this->perPage);
     }
 
+    #[On('user-created')]
+    public function afterCreated($id = null): void
+    {
+        $this->reset(['sortBy', 'sortDirection']);
+
+        $user = User::find($id);
+        if (!$user) {
+            return;
+        }
+        $beforeCount = User::where('id', '>', $user->id)->count();
+        $page = intdiv($beforeCount, $this->perPage) + 1;
+        $this->gotoPage($page);
+
+        $this->highlightedUserId = $user->id;
+    }
 
 }; ?>
 
@@ -42,15 +61,7 @@ new class extends Component {
     </flux:heading>
     <div class="inline-flex mt-2 mb-4">
         <flux:text>{{__('کاربران شعب آموزشگاهها')}}</flux:text>
-        <flux:tooltip content="استاندارد جدید" position="left">
-            <flux:link href="{{ route('standard.create') }}" wire:navigate x-data="{ loading: false }"
-                       @click="loading = true">
-                {{-- آیکن پلاس --}}
-                <flux:icon.plus-circle x-show="!loading" variant="micro" class="size-5 text-blue-500 mr-3"/>
-                {{-- لودر --}}
-                <flux:icon.loading x-show="loading" class="size-5 animate-spin text-blue-500 mr-3"/>
-            </flux:link>
-        </flux:tooltip>
+        <livewire:user.create/>
     </div>
 
     <flux:separator variant="subtle"/>
@@ -60,7 +71,7 @@ new class extends Component {
 
             <flux:table.column align="center" sortable :sorted="$sortBy === 'id'" :direction="$sortDirection"
                                wire:click="sort('id')">
-                {{__('#')}}
+                {{__('شناسه')}}
             </flux:table.column>
 
             <flux:table.column align="center" sortable :sorted="$sortBy === 'user_name'" :direction="$sortDirection"
@@ -89,22 +100,29 @@ new class extends Component {
         </flux:table.columns>
 
         <flux:table.rows>
+
+            @if($highlightedUserId)
+                <div x-data x-init="setTimeout(() => $wire.set('highlightedUserId', null), 2000)"></div>
+            @endif
             @foreach ($this->users as $user)
-                <flux:table.row>
+                @php($class='')
+
+                @if($highlightedUserId === $user->id)
+                    @php($class='bg-green-100 dark:bg-green-900/40')
+                @endif
+
+                <flux:table.row class="{{$class}} dark:hover:bg-stone-900/80 transition duration-300 hover:bg-zinc-100"
+                                :key="$user->id">
                     <flux:table.cell>{{ $user->id }}</flux:table.cell>
                     <flux:table.cell>{{ $user->user_name }}</flux:table.cell>
                     <flux:table.cell>{{ $user->profile->f_name_fa . ' ' . $user->profile->l_name_fa }}</flux:table.cell>
                     <flux:table.cell>
                         @foreach($user->getAllRolesWithBranches() as $role)
-                            <flux:badge color="cyan" size="sm" inset="top bottom">
+                            <flux:badge color="{{$role->role_color}}" size="sm">
                                 {{ $role->role_name  }}
                                 {{ $role->branch_name  }}
                             </flux:badge>
-
-
                         @endforeach
-
-
                     </flux:table.cell>
 
                     <flux:table.cell class="whitespace-nowrap">
@@ -127,10 +145,7 @@ new class extends Component {
 
                 </flux:table.row>
             @endforeach
-
         </flux:table.rows>
-
-
     </flux:table>
 
 

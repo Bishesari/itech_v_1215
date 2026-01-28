@@ -7,7 +7,6 @@ use App\Models\Contact;
 use App\Models\OtpLog;
 use App\Models\User;
 use App\Rules\NCode;
-use Flux\Flux;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -30,6 +29,19 @@ new class extends Component {
     public string $u_otp = '';
     public int $timer = 0; // front-end countdown
     public string $otp_log_check_err = '';
+
+    public ?string $redirect = null;
+
+    public function mount()
+    {
+        if ($this->context === 'modal'){
+            $this->redirect = url()->current();
+        }
+        else{
+            $this->redirect = session('url.intended');
+        }
+
+    }
 
     protected function rules(): array
     {
@@ -72,6 +84,7 @@ new class extends Component {
         $this->u_otp = '';
 
         // Generate numeric OTP
+//        $otp = 123456;
         $otp = NumericOTP();
 
         // Encrypt OTP for storage (so DB leak doesn't reveal codes)
@@ -174,8 +187,9 @@ new class extends Component {
     // -------------------------
     // Verify OTP and create user
     // -------------------------
-    public function otp_verify(): void
+    public function otp_verify()
     {
+
         $this->otp_log_check_err = '';
 
         // Find latest OTP record for this n_code + mobile
@@ -240,7 +254,7 @@ new class extends Component {
             // contact - search by mobile only, set verified flag if new
             $contact = Contact::firstOrCreate(
                 ['contact_value' => $this->contact_value],
-                ['verified' => 1]
+                ['is_verified' => 1]
             );
 
             // create profile
@@ -256,25 +270,22 @@ new class extends Component {
             // send the temporary password via SmsPass job
             SmsPass::dispatch($this->contact_value, $this->n_code, $tempPass);
 
-            event(new Registered($user));
-            Auth::login($user);
-
             session()->regenerate();
             session([
                 'active_role_id' => 1,
                 'active_branch_id' => null,
                 'color' => 'teal'
             ]);
+
+            event(new Registered($user));
+            Auth::login($user);
+
+
         });
 
         // stop client timer and redirect or reload
         $this->dispatch('stop_timer');
-
-        if ($this->context === 'modal') {
-            $this->dispatch('reloadPage');
-        } else {
-            $this->redirect('home');
-        }
+        return redirect()->to($this->redirect ?? route('home'));
     }
 
     public function reset_all(): void

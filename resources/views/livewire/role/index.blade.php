@@ -76,6 +76,7 @@ new class extends Component {
 
 
 <div>
+
     <flux:heading size="lg" level="1">
         {{__('اطلاعات پایه')}}
     </flux:heading>

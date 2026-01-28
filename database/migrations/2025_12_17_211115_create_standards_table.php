@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('field_id')->constrained()->cascadeOnDelete();
             $table->string('code', 15)->unique();
-            $table->string('name_fa', 50);
-            $table->string('name_en', 50);
+            $table->string('name_fa', 100);
+            $table->string('name_en', 100);
             $table->decimal('nazari_h', 5,1)->default(0);
             $table->decimal('amali_h', 5, 1)->default(0);
             $table->decimal('karvarzi_h', 5, 1)->default(0);

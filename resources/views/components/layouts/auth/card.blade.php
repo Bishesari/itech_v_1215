@@ -7,7 +7,7 @@
         <div class="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
             <div class="flex w-full max-w-md flex-col">
                 <a href="{{ route('home') }}" class="flex flex-col items-center" wire:navigate>
-                    <x-logo class="text-zinc-700 dark:text-zinc-300 h-16 pb-2"/>
+                    <x-logo class="text-zinc-700 dark:text-zinc-300 h-16 pb-2 animate-pulse"/>
                 </a>
                 <div class="flex flex-col">
                     <div class="rounded-xl border bg-white dark:bg-zinc-800 dark:border-stone-800 text-stone-800 shadow-xs">
