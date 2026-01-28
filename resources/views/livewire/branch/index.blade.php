@@ -109,7 +109,7 @@ new class extends Component {
         <flux:table.columns>
 
             <flux:table.column sortable :sorted="$sortBy === 'id'" :direction="$sortDirection"
-                               wire:click="sort('id')">{{__('#')}}
+                               wire:click="sort('id')">{{__('شناسه')}}
             </flux:table.column>
 
             <flux:table.column sortable :sorted="$sortBy === 'code'" :direction="$sortDirection"
@@ -157,7 +157,6 @@ new class extends Component {
                 <flux:table.row>
                     <flux:table.cell>
                         <flux:heading class="flex items-center gap-1">
-                            {{$branch->id}}
                             <flux:tooltip toggleable position="left">
                                 <flux:button icon="information-circle" size="sm" variant="ghost"
                                              class="cursor-pointer"/>
@@ -167,6 +166,7 @@ new class extends Component {
                                     <p class="text-justify">{{__('کدپستی: ')}}{{ $branch->postal_code }}</p>
                                 </flux:tooltip.content>
                             </flux:tooltip>
+                            <span class="pt-1">{{$branch->id}}</span>
                         </flux:heading>
                     </flux:table.cell>
                     <flux:table.cell>{{ $branch->code }}</flux:table.cell>

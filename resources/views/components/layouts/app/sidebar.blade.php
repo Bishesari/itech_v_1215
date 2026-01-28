@@ -5,7 +5,11 @@
 </head>
 @php
     use App\Models\Role;
+    use App\Models\Branch;
     $activeRole = Role::find(session('active_role_id'));
+    $activeBranch = Branch::find(session('active_branch_id'));
+
+
 @endphp
 <body class="min-h-screen bg-white dark:bg-zinc-800">
 
@@ -17,6 +21,9 @@
                 <x-logo class="text-zinc-700 dark:text-zinc-300"/>
             </x-slot>
         </flux:sidebar.brand>
+         @if ($activeBranch)
+            <flux:badge>{{$activeBranch->short_name}}</flux:badge>
+         @endif
         <flux:sidebar.collapse class="lg:hidden in-data-flux-sidebar-on-desktop:not-in-data-flux-sidebar-collapsed-desktop:-mr-2"/>
     </flux:sidebar.header>
 
@@ -25,11 +32,10 @@
     @if ($activeRole)
         @includeIf('partials.sidebars.' . $activeRole->name_en)
     @else
-        <flux:navlist.group :heading="__('بدون نقش')" class="grid">
-            <flux:navlist.item>
-                {{ __('هیچ نقشی انتخاب نشده است.') }}
-            </flux:navlist.item>
-        </flux:navlist.group>
+        <flux:navlist.item icon="user-group" :href="route('select_role')" wire:navigate x-data="{ loading: false }" @click="loading = true">
+            <span>{{ __('انتخاب نقش') }}</span>
+            <flux:icon.loading x-show="loading" class="inline absolute left-2 top-2 size-3.5 text-stone-500"/>
+        </flux:navlist.item>
     @endif
 
 

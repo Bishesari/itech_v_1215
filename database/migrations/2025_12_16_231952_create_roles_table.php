@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name_en', 50)->unique();
             $table->string('name_fa', 50)->unique();
+            $table->boolean('is_global');
             $table->string('color');
             $table->timestamps();
         });

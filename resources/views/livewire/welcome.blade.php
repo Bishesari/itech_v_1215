@@ -3,7 +3,6 @@
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Volt\Component;
-use App\Helpers\PageVisitHelper;
 
 new
 #[Layout('components.layouts.public')]
@@ -37,4 +36,17 @@ class extends Component {
 هدف ما آموزش مهارت‌هایی است که واقعاً منجر به اشتغال و پیشرفت شغلی شوند.')}}
     </flux:text>
     <flux:separator variant="subtle" />
+
+    <div class="container mx-auto py-6 grid grid-cols sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6" >
+        <a href="{{ route('products.by-category', 'written-questions') }}">
+            <flux:card size="sm">
+                <flux:heading class="flex items-center gap-2">
+                    سوالات پرتکرار کتبی
+                    <flux:icon name="arrow-up-left" variant="micro" class="mr-auto" />
+                </flux:heading>
+            </flux:card>
+        </a>
+
+    </div>
+
 </div>

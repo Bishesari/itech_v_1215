@@ -110,13 +110,11 @@ new class extends Component {
             <flux:table.column>{{ __('عملیات') }}</flux:table.column>
         </flux:table.columns>
 
+        @if($highlightedFieldId)
+            <div x-data x-init="setTimeout(() => $wire.set('highlightedFieldId', null), 1000)"></div>
+        @endif
 
         <flux:table.rows>
-
-            @if($highlightedFieldId)
-                <div x-data x-init="setTimeout(() => $wire.set('highlightedFieldId', null), 1000)"></div>
-            @endif
-
             @foreach ($this->fields as $field)
                 @php($class='')
                 @if($highlightedFieldId === $field->id)
@@ -130,7 +128,6 @@ new class extends Component {
                         <flux:badge color="green" size="sm"
                                     inset="top bottom">{{ $field->standards_count }}</flux:badge>
                     </flux:table.cell>
-
 
                     <flux:table.cell class="whitespace-nowrap">
                         <div class="leading-tight">
