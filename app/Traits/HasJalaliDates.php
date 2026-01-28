@@ -35,13 +35,20 @@ trait HasJalaliDates
         return $this->getJalaliDate('updated_at');
     }
 
-    public function getJalaliStartDateAttribute()
+    public function getJalaliStartDateTimeAttribute()
     {
-        return $this->getJalaliDate('start_date');
+        return $this->getJalaliDate('start_date_time');
     }
 
     public function getJalaliEndDateAttribute()
     {
         return $this->getJalaliDate('end_date');
     }
+
+    public function getJalaliActiveUntilAttribute()
+    {
+        return $this->getJalaliDate('active_until');
+    }
+
+
 }
